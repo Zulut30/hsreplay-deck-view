@@ -6,7 +6,7 @@
   <title>HSReplay Deck View Components</title>
   <meta
     name="description"
-    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, карточки архетипов, каменные портреты Battlegrounds и карточки синергий."
+    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, архетипы, портреты Battlegrounds, синергии, mulligan, matchups и meta badges."
   >
   <script>
     document.documentElement.dataset.view = new URLSearchParams(location.search).get("view") || "all";
@@ -34,6 +34,9 @@
       <a href="#archetypes">Архетипы</a>
       <a href="#stone">Камни</a>
       <a href="#synergies">Синергии</a>
+      <a href="#mulligans">Mulligan</a>
+      <a href="#matchups">Matchups</a>
+      <a href="#meta-badges">Meta</a>
       <a href="#api">API</a>
       <a class="site-nav-github" href="https://github.com/Zulut30/hsreplay-deck-view">GitHub</a>
     </nav>
@@ -97,6 +100,30 @@
             <strong>combo chain</strong>
           </div>
           <div id="hero-synergy" class="synergy-preview"></div>
+        </article>
+
+        <article class="component-card component-card--mulligan">
+          <div class="component-card-head">
+            <span>Mulligan card</span>
+            <strong>keep status</strong>
+          </div>
+          <div id="hero-mulligan" class="mulligan-preview"></div>
+        </article>
+
+        <article class="component-card component-card--matchup">
+          <div class="component-card-head">
+            <span>Matchup rows</span>
+            <strong>class winrate</strong>
+          </div>
+          <div id="hero-matchup" class="matchup-preview"></div>
+        </article>
+
+        <article class="component-card component-card--meta">
+          <div class="component-card-head">
+            <span>Tier badges</span>
+            <strong>meta labels</strong>
+          </div>
+          <div id="hero-meta" class="meta-preview"></div>
         </article>
       </div>
     </section>
@@ -189,6 +216,48 @@
       </div>
     </section>
 
+    <section id="mulligans" class="site-section detail-section detail-section--wide" aria-labelledby="mulligans-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 07</div>
+        <h2 id="mulligans-title">Mulligan card</h2>
+        <p>
+          Карточка стартовой руки: 3-4 карты, проценты keep/winrate и понятный
+          статус “оставлять / ситуативно / менять”.
+        </p>
+      </div>
+      <div class="mulligan-board">
+        <div id="sample-mulligans"></div>
+      </div>
+    </section>
+
+    <section id="matchups" class="site-section detail-section detail-section--wide" aria-labelledby="matchups-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 08</div>
+        <h2 id="matchups-title">Matchup row</h2>
+        <p>
+          Строка против класса: иконка, название, winrate, шкала преимущества и
+          маленькие ключевые карты.
+        </p>
+      </div>
+      <div class="matchup-board">
+        <div id="sample-matchups"></div>
+      </div>
+    </section>
+
+    <section id="meta-badges" class="site-section detail-section detail-section--wide" aria-labelledby="meta-badges-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 09</div>
+        <h2 id="meta-badges-title">Tier/meta badge</h2>
+        <p>
+          Небольшие блоки для статуса архетипа: Tier 1, Tier 2, Counter, Meme,
+          Rising и Falling.
+        </p>
+      </div>
+      <div class="meta-board">
+        <div id="sample-meta-badges"></div>
+      </div>
+    </section>
+
     <section id="reference" class="site-section reference-section" aria-labelledby="reference-title">
       <div class="section-copy">
         <div class="section-kicker">Reference</div>
@@ -226,6 +295,9 @@
   HSReplayDeckView.renderArchetypes("#archetypes", archetypes);
   HSReplayDeckView.renderStonePortraits("#stone", portraits);
   HSReplayDeckView.renderSynergies("#synergies", synergies);
+  HSReplayDeckView.renderMulligans("#mulligans", mulligans);
+  HSReplayDeckView.renderMatchups("#matchups", matchups);
+  HSReplayDeckView.renderMetaBadges("#badges", badges);
 &lt;/script&gt;</code></pre>
     </section>
   </main>

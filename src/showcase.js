@@ -125,6 +125,82 @@
     }
   ];
 
+  const MULLIGANS = [
+    {
+      title: "Imbue Rogue mulligan",
+      subtitle: "Стартовая рука против поля: быстрый темп, добор и один ситуативный keep.",
+      badge: "ranked",
+      cards: [
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", keepRate: 74.2, winrate: 55.8, status: "keep", note: "лучший темповый старт", count: 2 },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", keepRate: 68.1, winrate: 54.6, status: "keep", note: "оставлять почти всегда", count: 2 },
+        { id: "END_020", name: "Карта сектантов", rarity: "RARE", keepRate: 49.4, winrate: 51.1, status: "situational", note: "лучше с монеткой", count: 2 },
+        { id: "CATA_190h", name: "Смертокрыл", rarity: "LEGENDARY", keepRate: 11.8, winrate: 43.2, status: "replace", note: "слишком тяжелая карта" }
+      ]
+    },
+    {
+      title: "Control opener",
+      subtitle: "Оставляем ранний ответ и ресурс, дорогие payoff-карты меняем.",
+      badge: "vs aggro",
+      cards: [
+        { id: "CORE_CS2_072", name: "Удар в спину", rarity: "COMMON", keepRate: 81.4, winrate: 57.3, status: "keep", count: 2 },
+        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", keepRate: 63.9, winrate: 52.8, status: "keep", count: 2 },
+        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", keepRate: 42.5, winrate: 49.6, status: "situational", count: 2 },
+        { id: "AT_072", name: "Вариан Ринн", rarity: "LEGENDARY", keepRate: 8.7, winrate: 41.9, status: "replace" }
+      ]
+    }
+  ];
+
+  const MATCHUPS = [
+    {
+      name: "Spell Mage",
+      className: "Mage",
+      icon: "CS2_029",
+      winrate: 56.4,
+      games: 3240,
+      status: "favored",
+      cards: [
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", count: 2 },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", count: 2 },
+        { id: "TLC_100", name: "Навигатор Элиза", rarity: "LEGENDARY", elite: true }
+      ]
+    },
+    {
+      name: "Handbuff Paladin",
+      className: "Paladin",
+      icon: "CS2_087",
+      winrate: 50.8,
+      games: 2180,
+      status: "even",
+      cards: [
+        { id: "CORE_CS2_072", name: "Удар в спину", rarity: "COMMON", count: 2 },
+        { id: "END_020", name: "Карта сектантов", rarity: "RARE", count: 2 },
+        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", count: 2 }
+      ]
+    },
+    {
+      name: "Token Hunter",
+      className: "Hunter",
+      icon: "DS1_185",
+      winrate: 44.7,
+      games: 1560,
+      status: "unfavored",
+      cards: [
+        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", count: 2 },
+        { id: "CORE_CFM_604", name: "Веер клинков", rarity: "COMMON" },
+        { id: "CATA_190h", name: "Смертокрыл", rarity: "LEGENDARY", elite: true }
+      ]
+    }
+  ];
+
+  const META_BADGES = [
+    { kind: "tier-1", label: "Tier 1", title: "Meta leader", value: "56,4%", delta: "+2,1%", description: "Стабильный лидер с хорошими матчапами против популярных колод." },
+    { kind: "tier-2", label: "Tier 2", title: "Solid ladder", value: "51,8%", delta: "+0,4%", description: "Надежный выбор без явного доминирования в поле." },
+    { kind: "counter", label: "Counter", title: "Anti-aggro pick", value: "61%", delta: "target", description: "Берется против конкретного популярного архетипа." },
+    { kind: "meme", label: "Meme", title: "Fun build", value: "47%", delta: "spicy", description: "Играбельно, но ценность больше в идее и зрелищности." },
+    { kind: "rising", label: "Rising", title: "Climbing", value: "+18%", delta: "new", description: "Быстро набирает игры и может стать новым стандартом." },
+    { kind: "falling", label: "Falling", title: "Losing ground", value: "-9%", delta: "down", description: "Сдает позиции из-за новых контр-колод и плохих матчапов." }
+  ];
+
   function render() {
     const api = window.HSReplayDeckView;
     if (!api) {
@@ -150,6 +226,9 @@
     })));
     api.renderStonePortraits("#hero-stone", STONE_PORTRAITS);
     api.renderSynergies("#hero-synergy", SYNERGIES.slice(0, 1));
+    api.renderMulligans("#hero-mulligan", MULLIGANS.slice(0, 1));
+    api.renderMatchups("#hero-matchup", MATCHUPS.slice(0, 2));
+    api.renderMetaBadges("#hero-meta", META_BADGES.slice(0, 3));
 
     api.renderDeck("#sample-deck", DECK_CARDS, {
       group: false,
@@ -166,6 +245,9 @@
     api.renderArchetypes("#sample-archetypes", ARCHETYPES);
     api.renderStonePortraits("#sample-stone", STONE_PORTRAITS);
     api.renderSynergies("#sample-synergies", SYNERGIES);
+    api.renderMulligans("#sample-mulligans", MULLIGANS);
+    api.renderMatchups("#sample-matchups", MATCHUPS);
+    api.renderMetaBadges("#sample-meta-badges", META_BADGES);
 
     api.renderDeck("#rarity-showcase", RARITY_CARDS, {
       group: false,

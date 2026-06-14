@@ -28,7 +28,13 @@
     stonePortraitArtFormat: "webp",
     stonePortraitFrameImage: "https://static.hsreplay.net/static/webpack/assets/images/battlegrounds/minion-frame.d21732172d83faeae997.png",
     synergyArtBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
-    synergyArtFormat: "webp"
+    synergyArtFormat: "webp",
+    mulliganArtBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
+    mulliganArtFormat: "webp",
+    matchupArtBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
+    matchupArtFormat: "webp",
+    matchupIconBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
+    matchupIconFormat: "webp"
   };
 
   const RARITY_ORDER = {
@@ -38,6 +44,21 @@
     epic: 3,
     legendary: 4
   };
+
+  const MULLIGAN_STATUS_LABELS = {
+    keep: "оставлять",
+    situational: "ситуативно",
+    replace: "менять"
+  };
+
+  const META_BADGE_KINDS = new Set([
+    "tier-1",
+    "tier-2",
+    "counter",
+    "meme",
+    "rising",
+    "falling"
+  ]);
 
   const databaseCache = new Map();
 
@@ -199,6 +220,30 @@
     return `${options.synergyArtBaseUrl}${item.id}.${options.synergyArtFormat}`;
   }
 
+  function getMulliganArtUrl(item, options) {
+    if (item.image) {
+      return item.image;
+    }
+    if (!item.id) {
+      return "";
+    }
+    return `${options.mulliganArtBaseUrl}${item.id}.${options.mulliganArtFormat}`;
+  }
+
+  function getMatchupArtUrl(item, options) {
+    if (item.image) {
+      return item.image;
+    }
+    if (!item.id) {
+      return "";
+    }
+    return `${options.matchupArtBaseUrl}${item.id}.${options.matchupArtFormat}`;
+  }
+
+  function getMatchupIconUrl(matchup, options) {
+    return getArtworkUrl(matchup.icon, options.matchupIconBaseUrl, options.matchupIconFormat);
+  }
+
   function createElement(tagName, className, text) {
     const element = document.createElement(tagName);
     if (className) {
@@ -257,6 +302,62 @@
       return [];
     }
     return input.split(/[,\s]+/).map((value) => value.trim()).filter(Boolean);
+  }
+
+  function parseCardItems(input) {
+    if (Array.isArray(input)) {
+      return input;
+    }
+    if (typeof input !== "string") {
+      return [];
+    }
+    return input.split(/[,\s]+/).map((value) => value.trim()).filter(Boolean);
+  }
+
+  function parsePercent(value) {
+    if (value === null || typeof value === "undefined") {
+      return null;
+    }
+    if (typeof value === "string" && value.trim() === "") {
+      return null;
+    }
+    if (Number.isFinite(Number(value))) {
+      return Number(value);
+    }
+    if (typeof value !== "string") {
+      return null;
+    }
+    const parsed = Number.parseFloat(value.replace(",", ".").replace("%", ""));
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  function clampPercent(value) {
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+    return Math.max(0, Math.min(100, value));
+  }
+
+  function formatPercent(value) {
+    const parsed = parsePercent(value);
+    if (parsed === null) {
+      return value ? String(value) : "";
+    }
+    return `${parsed.toLocaleString("ru-RU", {
+      maximumFractionDigits: 1,
+      minimumFractionDigits: Number.isInteger(parsed) ? 0 : 1
+    })}%`;
+  }
+
+  function formatNumber(value) {
+    if (value === null || typeof value === "undefined" || value === "") {
+      return "";
+    }
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return String(value);
+    }
+    return parsed.toLocaleString("ru-RU");
   }
 
   function normalizeArchetype(archetype) {
@@ -389,6 +490,192 @@
       result,
       url: raw.url || raw.href || "",
       label: raw.label || raw.ariaLabel || raw.title || raw.name || "Synergy"
+    };
+  }
+
+  function normalizeMulliganStatus(status, keepRate) {
+    const value = String(status || "").trim().toLowerCase();
+    if (["keep", "hold", "always", "good", "оставлять", "оставить", "кип"].includes(value)) {
+      return "keep";
+    }
+    if (["situational", "case", "maybe", "coin", "matchup", "ситуативно", "по ситуации"].includes(value)) {
+      return "situational";
+    }
+    if (["replace", "change", "mulligan", "bad", "менять", "заменить", "скидывать"].includes(value)) {
+      return "replace";
+    }
+
+    const parsedKeepRate = parsePercent(keepRate);
+    if (parsedKeepRate !== null) {
+      if (parsedKeepRate >= 62) {
+        return "keep";
+      }
+      if (parsedKeepRate >= 45) {
+        return "situational";
+      }
+      return "replace";
+    }
+    return "situational";
+  }
+
+  function normalizeMulliganItem(item) {
+    if (typeof item === "number") {
+      return normalizeMulliganItem(String(item));
+    }
+    if (typeof item === "string") {
+      const value = item.trim();
+      const isImage = isDirectImageUrl(value);
+      return {
+        id: isImage ? "" : value,
+        dbfId: null,
+        name: value || "Unknown card",
+        image: isImage ? value : "",
+        href: "",
+        rarity: "common",
+        keepRate: "",
+        winrate: "",
+        status: "situational",
+        note: "",
+        predicted: false
+      };
+    }
+
+    const raw = item || {};
+    const keepRate = raw.keepRate ?? raw.keep ?? raw.kept ?? raw.keepPercent ?? raw.keep_percentage ?? "";
+    const status = normalizeMulliganStatus(raw.status || raw.decision || raw.state || raw.label, keepRate);
+    return {
+      id: String(raw.id || raw.cardId || raw.card_id || "").trim(),
+      dbfId: raw.dbfId || raw.dbf_id || null,
+      name: raw.name || raw.title || raw.cardName || raw.id || "Unknown card",
+      image: raw.image || raw.imageUrl || raw.art || raw.src || "",
+      href: raw.href || raw.url || "",
+      rarity: normalizeRarity(raw.rarity),
+      keepRate,
+      winrate: raw.winrate ?? raw.winRate ?? raw.wr ?? "",
+      status,
+      note: raw.note || raw.reason || raw.caption || "",
+      predicted: Boolean(raw.predicted)
+    };
+  }
+
+  function normalizeMulligan(mulligan) {
+    if (Array.isArray(mulligan)) {
+      return {
+        title: "Mulligan",
+        subtitle: "",
+        badge: "",
+        cards: mulligan.map(normalizeMulliganItem),
+        url: "",
+        label: "Mulligan"
+      };
+    }
+
+    const raw = mulligan || {};
+    return {
+      title: raw.title || raw.name || "Стартовая рука",
+      subtitle: raw.subtitle || raw.description || raw.text || "",
+      badge: raw.badge || raw.tag || raw.context || "",
+      cards: parseCardItems(raw.cards || raw.items || raw.hand || raw.cardIds).map(normalizeMulliganItem),
+      url: raw.url || raw.href || "",
+      label: raw.label || raw.ariaLabel || raw.title || raw.name || "Mulligan"
+    };
+  }
+
+  function normalizeMatchupStatus(status, winrate) {
+    const value = String(status || "").trim().toLowerCase();
+    if (["favored", "favorable", "good", "advantage", "выгодный", "хороший"].includes(value)) {
+      return "favored";
+    }
+    if (["even", "neutral", "mirror", "ровный", "средний"].includes(value)) {
+      return "even";
+    }
+    if (["unfavored", "bad", "disadvantage", "weak", "плохой", "невыгодный"].includes(value)) {
+      return "unfavored";
+    }
+
+    const parsedWinrate = parsePercent(winrate);
+    if (parsedWinrate !== null) {
+      if (parsedWinrate >= 53) {
+        return "favored";
+      }
+      if (parsedWinrate <= 47) {
+        return "unfavored";
+      }
+    }
+    return "even";
+  }
+
+  function normalizeMatchupCard(card) {
+    if (typeof card === "number") {
+      return normalizeMatchupCard(String(card));
+    }
+    if (typeof card === "string") {
+      const value = card.trim();
+      const isImage = isDirectImageUrl(value);
+      return {
+        id: isImage ? "" : value,
+        dbfId: null,
+        name: value || "Unknown card",
+        image: isImage ? value : "",
+        rarity: "common",
+        count: 1,
+        elite: false
+      };
+    }
+    const raw = card || {};
+    const rarity = normalizeRarity(raw.rarity);
+    return {
+      id: String(raw.id || raw.cardId || raw.card_id || "").trim(),
+      dbfId: raw.dbfId || raw.dbf_id || null,
+      name: raw.name || raw.title || raw.cardName || raw.id || "Unknown card",
+      image: raw.image || raw.imageUrl || raw.art || raw.src || "",
+      rarity,
+      count: Math.max(1, Number(raw.count || 1)),
+      elite: Boolean(raw.elite) || rarity === "legendary"
+    };
+  }
+
+  function normalizeMatchup(matchup) {
+    const raw = matchup || {};
+    const winrate = raw.winrate ?? raw.winRate ?? raw.wr ?? raw.value ?? "";
+    const status = normalizeMatchupStatus(raw.status || raw.result || raw.state, winrate);
+    return {
+      name: raw.name || raw.title || raw.opponent || raw.className || "Unknown matchup",
+      className: raw.className || raw.class || raw.hero || "",
+      icon: raw.icon || raw.iconUrl || raw.classIcon || raw.classIconUrl || raw.image || "",
+      winrate,
+      games: raw.games ?? raw.matches ?? raw.count ?? "",
+      status,
+      note: raw.note || raw.description || "",
+      cards: parseCardItems(raw.cards || raw.keyCards || raw.items || raw.cardIds).map(normalizeMatchupCard),
+      url: raw.url || raw.href || "",
+      label: raw.label || raw.ariaLabel || raw.name || raw.title || "Matchup"
+    };
+  }
+
+  function normalizeMetaKind(kind, label) {
+    const value = String(kind || label || "").trim().toLowerCase().replace(/\s+/g, "-");
+    const normalized = value
+      .replace(/^t1$/, "tier-1")
+      .replace(/^tier1$/, "tier-1")
+      .replace(/^t2$/, "tier-2")
+      .replace(/^tier2$/, "tier-2");
+    return META_BADGE_KINDS.has(normalized) ? normalized : "tier-2";
+  }
+
+  function normalizeMetaBadge(badge) {
+    const raw = badge || {};
+    const label = raw.label || raw.badge || raw.tier || raw.kind || "Tier 2";
+    const kind = normalizeMetaKind(raw.kind || raw.type || raw.status, label);
+    return {
+      kind,
+      label,
+      title: raw.title || raw.name || label,
+      value: raw.value || raw.score || raw.winrate || "",
+      delta: raw.delta || raw.trend || raw.change || "",
+      description: raw.description || raw.text || raw.note || "",
+      url: raw.url || raw.href || "",
+      labelText: raw.ariaLabel || raw.title || raw.name || label
     };
   }
 
@@ -714,6 +1001,202 @@
     return element;
   }
 
+  function createMulliganItem(rawItem, options) {
+    const settings = withDefaults(options);
+    const item = normalizeMulliganItem(rawItem);
+    const element = createElement(
+      item.href ? "a" : "article",
+      `hsrdv-mulligan-item hsrdv-mulligan-item--${item.status}${item.predicted ? " hsrdv-mulligan-item--predicted" : ""}`
+    );
+    element.setAttribute("aria-label", `${item.name}, ${MULLIGAN_STATUS_LABELS[item.status]}`);
+    if (item.href) {
+      element.href = item.href;
+    }
+    if (item.dbfId) {
+      element.dataset.dbfId = String(item.dbfId);
+    }
+    if (item.id) {
+      element.dataset.cardId = item.id;
+    }
+
+    const artBox = createElement("span", `hsrdv-mulligan-artbox hsrdv-rarity-${item.rarity}`);
+    const artUrl = getMulliganArtUrl(item, settings);
+    if (artUrl) {
+      const art = createElement("span", "hsrdv-mulligan-art");
+      art.style.backgroundImage = `url("${artUrl}")`;
+      artBox.appendChild(art);
+    }
+    element.appendChild(artBox);
+
+    const body = createElement("span", "hsrdv-mulligan-body");
+    body.appendChild(createElement("strong", "hsrdv-mulligan-name", item.name));
+    body.appendChild(createElement("span", "hsrdv-mulligan-status", MULLIGAN_STATUS_LABELS[item.status]));
+
+    const metrics = createElement("span", "hsrdv-mulligan-metrics");
+    if (item.keepRate !== "") {
+      const metric = createElement("span", "hsrdv-mulligan-metric");
+      metric.appendChild(createElement("span", "", "Keep"));
+      metric.appendChild(createElement("strong", "", formatPercent(item.keepRate)));
+      metrics.appendChild(metric);
+    }
+    if (item.winrate !== "") {
+      const metric = createElement("span", "hsrdv-mulligan-metric");
+      metric.appendChild(createElement("span", "", "WR"));
+      metric.appendChild(createElement("strong", "", formatPercent(item.winrate)));
+      metrics.appendChild(metric);
+    }
+    if (metrics.childElementCount) {
+      body.appendChild(metrics);
+    }
+    if (item.note) {
+      body.appendChild(createElement("span", "hsrdv-mulligan-note", item.note));
+    }
+
+    element.appendChild(body);
+    return element;
+  }
+
+  function createMulliganCard(rawMulligan, options) {
+    const settings = withDefaults(options);
+    const mulligan = normalizeMulligan(rawMulligan);
+    const element = createElement(
+      mulligan.url ? "a" : "article",
+      "hsrdv-mulligan-card"
+    );
+    element.setAttribute("aria-label", mulligan.label || mulligan.title);
+    if (mulligan.url) {
+      element.href = mulligan.url;
+    }
+
+    const header = createElement("header", "hsrdv-mulligan-header");
+    const titleGroup = createElement("div", "hsrdv-mulligan-title-group");
+    titleGroup.appendChild(createElement("h3", "hsrdv-mulligan-title", mulligan.title));
+    if (mulligan.subtitle) {
+      titleGroup.appendChild(createElement("p", "hsrdv-mulligan-subtitle", mulligan.subtitle));
+    }
+    header.appendChild(titleGroup);
+    if (mulligan.badge) {
+      header.appendChild(createElement("span", "hsrdv-mulligan-badge", mulligan.badge));
+    }
+    element.appendChild(header);
+
+    const list = createElement("div", "hsrdv-mulligan-cards");
+    mulligan.cards.forEach((card) => {
+      list.appendChild(createMulliganItem(card, settings));
+    });
+    element.appendChild(list);
+    return element;
+  }
+
+  function createMatchupMiniCard(rawCard, options) {
+    const settings = withDefaults(options);
+    const card = normalizeMatchupCard(rawCard);
+    const badgeLabel = getIconBadgeLabel(card, settings);
+    const element = createElement("span", `hsrdv-matchup-card hsrdv-rarity-${card.rarity}`);
+    element.setAttribute("role", "img");
+    element.setAttribute("aria-label", badgeLabel ? `${card.name} ${badgeLabel}` : card.name);
+    if (card.dbfId) {
+      element.dataset.dbfId = String(card.dbfId);
+    }
+    if (card.id) {
+      element.dataset.cardId = card.id;
+    }
+
+    const artUrl = getMatchupArtUrl(card, settings);
+    if (artUrl) {
+      element.style.backgroundImage = `url("${artUrl}")`;
+    }
+    if (badgeLabel) {
+      const badgeClass = badgeLabel === "★"
+        ? "hsrdv-matchup-card-badge hsrdv-matchup-card-badge--star"
+        : "hsrdv-matchup-card-badge hsrdv-matchup-card-badge--copies";
+      element.appendChild(createElement("span", badgeClass, badgeLabel));
+    }
+    return element;
+  }
+
+  function createMatchupRow(rawMatchup, options) {
+    const settings = withDefaults(options);
+    const matchup = normalizeMatchup(rawMatchup);
+    const parsedWinrate = parsePercent(matchup.winrate);
+    const winrateValue = clampPercent(parsedWinrate ?? 50);
+    const element = createElement(
+      matchup.url ? "a" : "article",
+      `hsrdv-matchup-row hsrdv-matchup-row--${matchup.status}`
+    );
+    element.setAttribute("aria-label", matchup.label || matchup.name);
+    element.style.setProperty("--hsrdv-matchup-winrate", `${winrateValue}%`);
+    if (matchup.url) {
+      element.href = matchup.url;
+    }
+
+    const opponent = createElement("div", "hsrdv-matchup-opponent");
+    const iconUrl = getMatchupIconUrl(matchup, settings);
+    if (iconUrl) {
+      const icon = createElement("img", "hsrdv-matchup-icon");
+      icon.src = iconUrl;
+      icon.alt = matchup.className || matchup.name;
+      opponent.appendChild(icon);
+    } else {
+      opponent.appendChild(createElement("span", "hsrdv-matchup-icon hsrdv-matchup-icon--fallback", matchup.name.slice(0, 1)));
+    }
+    const text = createElement("span", "hsrdv-matchup-text");
+    text.appendChild(createElement("strong", "", matchup.name));
+    if (matchup.className) {
+      text.appendChild(createElement("span", "", matchup.className));
+    }
+    opponent.appendChild(text);
+    element.appendChild(opponent);
+
+    const score = createElement("div", "hsrdv-matchup-score");
+    score.appendChild(createElement("strong", "", formatPercent(matchup.winrate)));
+    if (matchup.games !== "") {
+      score.appendChild(createElement("span", "", `${formatNumber(matchup.games)} игр`));
+    }
+    element.appendChild(score);
+
+    const gauge = createElement("div", "hsrdv-matchup-gauge");
+    gauge.appendChild(createElement("span", "hsrdv-matchup-gauge-fill"));
+    gauge.appendChild(createElement("span", "hsrdv-matchup-gauge-mid"));
+    element.appendChild(gauge);
+
+    const cards = createElement("div", "hsrdv-matchup-keycards");
+    matchup.cards.forEach((card) => {
+      cards.appendChild(createMatchupMiniCard(card, settings));
+    });
+    element.appendChild(cards);
+
+    return element;
+  }
+
+  function createMetaBadge(rawBadge) {
+    const badge = normalizeMetaBadge(rawBadge);
+    const element = createElement(
+      badge.url ? "a" : "article",
+      `hsrdv-meta-badge hsrdv-meta-badge--${badge.kind}`
+    );
+    element.setAttribute("aria-label", badge.labelText);
+    if (badge.url) {
+      element.href = badge.url;
+    }
+
+    const header = createElement("span", "hsrdv-meta-badge-header");
+    header.appendChild(createElement("span", "hsrdv-meta-badge-label", badge.label));
+    if (badge.delta) {
+      header.appendChild(createElement("span", "hsrdv-meta-badge-delta", badge.delta));
+    }
+    element.appendChild(header);
+
+    element.appendChild(createElement("strong", "hsrdv-meta-badge-title", badge.title));
+    if (badge.value) {
+      element.appendChild(createElement("span", "hsrdv-meta-badge-value", badge.value));
+    }
+    if (badge.description) {
+      element.appendChild(createElement("span", "hsrdv-meta-badge-description", badge.description));
+    }
+    return element;
+  }
+
   function renderDeck(target, cards, options) {
     const settings = withDefaults(options);
     const container = resolveTarget(target);
@@ -850,6 +1333,69 @@
     return rootElement;
   }
 
+  function renderMulligans(target, mulligans, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const rootElement = createElement("div", `hsrdv hsrdv-mulligans ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-mulligan-list");
+
+    (mulligans || []).forEach((mulligan) => {
+      const item = createElement("li");
+      item.appendChild(createMulliganCard(mulligan, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
+  function renderMatchups(target, matchups, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const rootElement = createElement("div", `hsrdv hsrdv-matchups ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-matchup-list");
+
+    (matchups || []).forEach((matchup) => {
+      const item = createElement("li");
+      item.appendChild(createMatchupRow(matchup, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
+  function renderMetaBadges(target, badges, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const rootElement = createElement("div", `hsrdv hsrdv-meta-badges ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-meta-badge-list");
+
+    (badges || []).forEach((badge) => {
+      const item = createElement("li");
+      item.appendChild(createMetaBadge(badge, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
   async function loadCardDatabase(options) {
     const settings = withDefaults(options);
     const url = settings.dataUrl.replace("{locale}", settings.locale);
@@ -900,6 +1446,11 @@
   return {
     createArchetypeCard,
     createIcon,
+    createMatchupMiniCard,
+    createMatchupRow,
+    createMetaBadge,
+    createMulliganCard,
+    createMulliganItem,
     createSquareIcon,
     createStonePortrait,
     createSynergyCard,
@@ -909,6 +1460,11 @@
     groupCards,
     loadCardDatabase,
     normalizeCard,
+    normalizeMatchup,
+    normalizeMatchupCard,
+    normalizeMetaBadge,
+    normalizeMulligan,
+    normalizeMulliganItem,
     normalizeStonePortrait,
     normalizeSynergy,
     normalizeSynergyItem,
@@ -918,6 +1474,9 @@
     renderArchetypes,
     renderIcons,
     renderIconsFromDbfIds,
+    renderMatchups,
+    renderMetaBadges,
+    renderMulligans,
     renderSquareIcons,
     renderSquareIconsFromDbfIds,
     renderStonePortraits,

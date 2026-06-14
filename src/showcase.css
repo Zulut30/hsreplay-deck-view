@@ -211,7 +211,7 @@ p {
 }
 
 .component-card--deck {
-  grid-row: span 5;
+  grid-row: span 3;
 }
 
 .component-card-head {
@@ -251,7 +251,10 @@ p {
 .squares-preview,
 .archetype-preview,
 .stone-preview,
-.synergy-preview {
+.synergy-preview,
+.mulligan-preview,
+.matchup-preview,
+.meta-preview {
   min-width: 0;
 }
 
@@ -260,11 +263,17 @@ p {
 .archetype-preview .hsrdv,
 .stone-preview .hsrdv,
 .synergy-preview .hsrdv,
+.mulligan-preview .hsrdv,
+.matchup-preview .hsrdv,
+.meta-preview .hsrdv,
 .deck-row-strip .hsrdv,
 .square-ribbon .hsrdv,
 .archetype-board .hsrdv,
 .stone-comp-showcase .hsrdv,
-.synergy-board .hsrdv {
+.synergy-board .hsrdv,
+.mulligan-board .hsrdv,
+.matchup-board .hsrdv,
+.meta-board .hsrdv {
   max-width: none;
 }
 
@@ -327,6 +336,73 @@ p {
   padding-bottom: 2px;
 }
 
+.mulligan-preview .hsrdv {
+  --hsrdv-mulligan-card-width: 100%;
+  --hsrdv-mulligan-art-size: 42px;
+  --hsrdv-mulligan-gap: 7px;
+}
+
+.mulligan-preview .hsrdv-mulligan-card {
+  gap: 10px;
+  padding: 12px;
+  box-shadow: none;
+}
+
+.mulligan-preview .hsrdv-mulligan-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mulligan-preview .hsrdv-mulligan-subtitle,
+.mulligan-preview .hsrdv-mulligan-note {
+  display: none;
+}
+
+.mulligan-preview .hsrdv-mulligan-name {
+  font-size: 0.78rem;
+}
+
+.matchup-preview .hsrdv {
+  --hsrdv-matchup-row-width: 100%;
+  --hsrdv-matchup-icon-size: 38px;
+  --hsrdv-matchup-card-size: 28px;
+}
+
+.matchup-preview .hsrdv-matchup-row {
+  grid-template-columns: minmax(150px, 1fr) 72px;
+  gap: 10px;
+  padding: 8px;
+  box-shadow: none;
+}
+
+.matchup-preview .hsrdv-matchup-gauge,
+.matchup-preview .hsrdv-matchup-keycards {
+  display: none;
+}
+
+.matchup-preview .hsrdv-matchup-score strong {
+  font-size: 1.05rem;
+}
+
+.meta-preview .hsrdv {
+  --hsrdv-meta-badge-width: 100%;
+}
+
+.meta-preview .hsrdv-meta-badge-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.meta-preview .hsrdv-meta-badge {
+  min-height: 94px;
+  padding: 10px;
+  box-shadow: none;
+}
+
+.meta-preview .hsrdv-meta-badge-value,
+.meta-preview .hsrdv-meta-badge-description {
+  display: none;
+}
+
 .detail-section,
 .reference-section,
 .api-section {
@@ -352,6 +428,9 @@ p {
 .archetype-board,
 .stone-comp-showcase,
 .synergy-board,
+.mulligan-board,
+.matchup-board,
+.meta-board,
 .api-section pre {
   min-width: 0;
   border: 1px solid var(--site-line);
@@ -479,6 +558,29 @@ p {
   --hsrdv-synergy-item-size: 72px;
   --hsrdv-synergy-item-gap: 14px;
   --hsrdv-synergy-connector-size: 38px;
+}
+
+.mulligan-board,
+.matchup-board,
+.meta-board {
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgb(248 250 252), rgb(232 237 243));
+}
+
+.mulligan-board .hsrdv {
+  --hsrdv-mulligan-card-width: 100%;
+  --hsrdv-mulligan-art-size: 62px;
+}
+
+.matchup-board .hsrdv {
+  --hsrdv-matchup-row-width: 100%;
+  --hsrdv-matchup-icon-size: 54px;
+  --hsrdv-matchup-card-size: 38px;
+}
+
+.meta-board .hsrdv {
+  --hsrdv-meta-badge-width: 100%;
 }
 
 .reference-grid {
@@ -609,6 +711,16 @@ p {
     --hsrdv-synergy-item-gap: 9px;
     --hsrdv-synergy-connector-size: 24px;
   }
+
+  .mulligan-board,
+  .matchup-board,
+  .meta-board {
+    padding: 12px;
+  }
+
+  .mulligan-board .hsrdv {
+    --hsrdv-mulligan-art-size: 54px;
+  }
 }
 
 html[data-view="deck"] .site-top,
@@ -617,6 +729,9 @@ html[data-view="squares"] .site-top,
 html[data-view="archetypes"] .site-top,
 html[data-view="stone"] .site-top,
 html[data-view="synergies"] .site-top,
+html[data-view="mulligans"] .site-top,
+html[data-view="matchups"] .site-top,
+html[data-view="meta-badges"] .site-top,
 html[data-view="showcase"] .site-top,
 html[data-view="deck"] .site-footer,
 html[data-view="icons"] .site-footer,
@@ -624,6 +739,9 @@ html[data-view="squares"] .site-footer,
 html[data-view="archetypes"] .site-footer,
 html[data-view="stone"] .site-footer,
 html[data-view="synergies"] .site-footer,
+html[data-view="mulligans"] .site-footer,
+html[data-view="matchups"] .site-footer,
+html[data-view="meta-badges"] .site-footer,
 html[data-view="showcase"] .site-footer {
   display: none;
 }
@@ -634,6 +752,9 @@ html[data-view="squares"] .site-main,
 html[data-view="archetypes"] .site-main,
 html[data-view="stone"] .site-main,
 html[data-view="synergies"] .site-main,
+html[data-view="mulligans"] .site-main,
+html[data-view="matchups"] .site-main,
+html[data-view="meta-badges"] .site-main,
 html[data-view="showcase"] .site-main {
   width: min(100vw - 16px, 1180px);
   padding: 4px 0 0;
@@ -645,6 +766,9 @@ html[data-view="squares"] .site-section,
 html[data-view="archetypes"] .site-section,
 html[data-view="stone"] .site-section,
 html[data-view="synergies"] .site-section,
+html[data-view="mulligans"] .site-section,
+html[data-view="matchups"] .site-section,
+html[data-view="meta-badges"] .site-section,
 html[data-view="showcase"] .site-section {
   margin-top: 0;
 }
@@ -655,6 +779,9 @@ html[data-view="squares"] .site-section:not(#squares),
 html[data-view="archetypes"] .site-section:not(#archetypes),
 html[data-view="stone"] .site-section:not(#stone),
 html[data-view="synergies"] .site-section:not(#synergies),
+html[data-view="mulligans"] .site-section:not(#mulligans),
+html[data-view="matchups"] .site-section:not(#matchups),
+html[data-view="meta-badges"] .site-section:not(#meta-badges),
 html[data-view="showcase"] .site-section:not(#reference) {
   display: none;
 }
@@ -665,6 +792,9 @@ html[data-view="squares"] .section-copy,
 html[data-view="archetypes"] .section-copy,
 html[data-view="stone"] .section-copy,
 html[data-view="synergies"] .section-copy,
+html[data-view="mulligans"] .section-copy,
+html[data-view="matchups"] .section-copy,
+html[data-view="meta-badges"] .section-copy,
 html[data-view="showcase"] .section-copy {
   display: none;
 }
@@ -675,6 +805,9 @@ html[data-view="squares"] .detail-section,
 html[data-view="archetypes"] .detail-section,
 html[data-view="stone"] .detail-section,
 html[data-view="synergies"] .detail-section,
+html[data-view="mulligans"] .detail-section,
+html[data-view="matchups"] .detail-section,
+html[data-view="meta-badges"] .detail-section,
 html[data-view="showcase"] .reference-section {
   display: block;
   padding-top: 0;
@@ -689,6 +822,9 @@ html[data-view="squares"] .square-ribbon,
 html[data-view="archetypes"] .archetype-board,
 html[data-view="stone"] .stone-comp-showcase,
 html[data-view="synergies"] .synergy-board,
+html[data-view="mulligans"] .mulligan-board,
+html[data-view="matchups"] .matchup-board,
+html[data-view="meta-badges"] .meta-board,
 html[data-view="showcase"] .reference-grid {
   box-shadow: none;
 }

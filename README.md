@@ -1,6 +1,6 @@
 # HSReplay Deck View
 
-Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых/квадратных иконок, строка архетипа с несколькими артами на фоне через диагональные разделители, большой каменный Battlegrounds-портрет и карточка синергии для комбо/BG-связок.
+Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых/квадратных иконок, строка архетипа с несколькими артами на фоне через диагональные разделители, большой каменный Battlegrounds-портрет, карточка синергии для комбо/BG-связок, mulligan card, matchup row и tier/meta badges.
 
 Проект не требует сборки и фреймворков. Достаточно подключить CSS и JS.
 
@@ -35,6 +35,18 @@ GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
 ### Карточка синергии
 
 ![Synergy card demo](assets/screenshots/synergy-card-demo.png)
+
+### Mulligan card
+
+![Mulligan card demo](assets/screenshots/mulligan-card-demo.png)
+
+### Matchup row
+
+![Matchup row demo](assets/screenshots/matchup-row-demo.png)
+
+### Tier/meta badge
+
+![Meta badge demo](assets/screenshots/meta-badge-demo.png)
 
 ### Все редкости и стоимости 0-10
 
@@ -332,6 +344,167 @@ items: ["CORE_EX1_145", "EDR_852", "TIME_045"]
 }
 ```
 
+## Mulligan card
+
+Карточка mulligan показывает 3-4 карты стартовой руки, проценты keep/winrate и цветовой статус решения:
+
+- `keep` / `оставлять` — зеленый статус для карт, которые почти всегда хочется оставить;
+- `situational` / `ситуативно` — желтый статус для карт под монетку, матчап или уже найденную связку;
+- `replace` / `менять` — красный статус для карт, которые чаще нужно возвращать.
+
+```html
+<link rel="stylesheet" href="src/hsreplay-deck-view.css">
+<div id="mulligan"></div>
+<script src="src/hsreplay-deck-view.js"></script>
+<script>
+  HSReplayDeckView.renderMulligans("#mulligan", [
+    {
+      title: "Imbue Rogue mulligan",
+      subtitle: "Стартовая рука против поля: быстрый темп, добор и один ситуативный keep.",
+      badge: "ranked",
+      cards: [
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", keepRate: 74.2, winrate: 55.8, status: "keep", note: "лучший темповый старт" },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", keepRate: 68.1, winrate: 54.6, status: "keep" },
+        { id: "END_020", name: "Карта сектантов", rarity: "RARE", keepRate: 49.4, winrate: 51.1, status: "situational", note: "лучше с монеткой" },
+        { id: "CATA_190h", name: "Смертокрыл", rarity: "LEGENDARY", keepRate: 11.8, winrate: 43.2, status: "replace" }
+      ]
+    }
+  ]);
+</script>
+```
+
+### Структура объекта mulligan
+
+| Поле | Тип | Что делает |
+|---|---|---|
+| `title` / `name` | string | Заголовок карточки |
+| `subtitle` / `description` / `text` | string | Короткое пояснение под заголовком |
+| `badge` / `tag` / `context` | string | Бейдж справа: `ranked`, `vs aggro`, `on coin` |
+| `cards` / `items` / `hand` / `cardIds` | array | Карты стартовой руки |
+| `url` / `href` | string | Если задан, вся карточка становится ссылкой |
+
+### Структура карты mulligan
+
+| Поле | Тип | Что делает |
+|---|---|---|
+| `id` / `cardId` | string | Hearthstone card id для `tiles/{id}.webp` |
+| `name` / `title` / `cardName` | string | Название карты |
+| `rarity` | string | Цветовой класс редкости |
+| `keepRate` / `keep` / `keepPercent` | number/string | Процент keep |
+| `winrate` / `winRate` / `wr` | number/string | Winrate при keep |
+| `status` / `decision` / `state` | string | `keep`, `situational`, `replace` или русские варианты |
+| `note` / `reason` / `caption` | string | Маленькая подпись под метриками |
+| `image` / `imageUrl` / `art` / `src` | string | Прямой URL картинки |
+| `href` / `url` | string | Если задан, отдельная карта становится ссылкой |
+
+Если `status` не передан, компонент сам оценит его по `keepRate`: примерно `62%+` как `keep`, `45-61%` как `situational`, ниже как `replace`.
+
+Полезные CSS-переменные:
+
+```css
+#mulligan .hsrdv {
+  --hsrdv-mulligan-card-width: 760px;
+  --hsrdv-mulligan-art-size: 60px;
+  --hsrdv-mulligan-gap: 10px;
+}
+```
+
+## Matchup row
+
+Matchup row нужен для мета-таблиц и страниц архетипов: слева противник, рядом winrate и шкала преимущества, справа маленькие ключевые карты.
+
+```html
+<link rel="stylesheet" href="src/hsreplay-deck-view.css">
+<div id="matchups"></div>
+<script src="src/hsreplay-deck-view.js"></script>
+<script>
+  HSReplayDeckView.renderMatchups("#matchups", [
+    {
+      name: "Spell Mage",
+      className: "Mage",
+      icon: "CS2_029",
+      winrate: 56.4,
+      games: 3240,
+      status: "favored",
+      cards: [
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", count: 2 },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", count: 2 },
+        { id: "TLC_100", name: "Навигатор Элиза", rarity: "LEGENDARY", elite: true }
+      ]
+    }
+  ]);
+</script>
+```
+
+### Структура matchup
+
+| Поле | Тип | Что делает |
+|---|---|---|
+| `name` / `title` / `opponent` | string | Название матчапа или архетипа противника |
+| `className` / `class` / `hero` | string | Подпись класса под названием |
+| `icon` / `classIcon` / `image` | string/object | Card id, прямой URL или объект картинки |
+| `winrate` / `winRate` / `wr` | number/string | Winrate, используется и для шкалы |
+| `games` / `matches` / `count` | number/string | Количество игр |
+| `status` / `result` / `state` | string | `favored`, `even`, `unfavored`; если не задано, считается по winrate |
+| `cards` / `keyCards` / `items` | array | Маленькие ключевые карты справа |
+| `url` / `href` | string | Если задан, строка становится ссылкой |
+
+Порог автоматического статуса: `53%+` как `favored`, `47-53%` как `even`, ниже `47%` как `unfavored`.
+
+Полезные CSS-переменные:
+
+```css
+#matchups .hsrdv {
+  --hsrdv-matchup-row-width: 840px;
+  --hsrdv-matchup-icon-size: 52px;
+  --hsrdv-matchup-card-size: 36px;
+}
+```
+
+## Tier/meta badges
+
+Meta badge — компактный блок статуса для архетипа или колоды. В библиотеке есть готовые варианты:
+
+- `tier-1`;
+- `tier-2`;
+- `counter`;
+- `meme`;
+- `rising`;
+- `falling`.
+
+```html
+<link rel="stylesheet" href="src/hsreplay-deck-view.css">
+<div id="meta-badges"></div>
+<script src="src/hsreplay-deck-view.js"></script>
+<script>
+  HSReplayDeckView.renderMetaBadges("#meta-badges", [
+    { kind: "tier-1", label: "Tier 1", title: "Meta leader", value: "56,4%", delta: "+2,1%", description: "Стабильный лидер с хорошими матчапами." },
+    { kind: "counter", label: "Counter", title: "Anti-aggro pick", value: "61%", delta: "target", description: "Берется против конкретного популярного архетипа." },
+    { kind: "falling", label: "Falling", title: "Losing ground", value: "-9%", delta: "down", description: "Сдает позиции из-за новых контр-колод." }
+  ]);
+</script>
+```
+
+### Структура meta badge
+
+| Поле | Тип | Что делает |
+|---|---|---|
+| `kind` / `type` / `status` | string | Вариант цвета: `tier-1`, `tier-2`, `counter`, `meme`, `rising`, `falling` |
+| `label` / `badge` / `tier` | string | Текст верхнего бейджа |
+| `title` / `name` | string | Главный текст блока |
+| `value` / `score` / `winrate` | string | Крупная метрика |
+| `delta` / `trend` / `change` | string | Маленький бейдж справа |
+| `description` / `text` / `note` | string | Короткое пояснение |
+| `url` / `href` | string | Если задан, блок становится ссылкой |
+
+Полезная CSS-переменная:
+
+```css
+#meta-badges .hsrdv {
+  --hsrdv-meta-badge-width: 840px;
+}
+```
+
 ## Готовые объекты карт
 
 Если на сайте уже есть данные карт, можно не грузить HearthstoneJSON:
@@ -436,6 +609,24 @@ HSReplayDeckView.renderSynergies(target, synergies, options)
 Рендерит список карточек синергий. Принимает массив объектов синергий; внутри каждой синергии `items` могут быть объектами, card id или прямыми URL.
 
 ```js
+HSReplayDeckView.renderMulligans(target, mulligans, options)
+```
+
+Рендерит список карточек стартовой руки с keep/winrate и статусами `keep`, `situational`, `replace`.
+
+```js
+HSReplayDeckView.renderMatchups(target, matchups, options)
+```
+
+Рендерит список matchup rows с иконкой класса, winrate, шкалой преимущества и ключевыми картами.
+
+```js
+HSReplayDeckView.renderMetaBadges(target, badges, options)
+```
+
+Рендерит сетку tier/meta badges: `tier-1`, `tier-2`, `counter`, `meme`, `rising`, `falling`.
+
+```js
 HSReplayDeckView.cardsFromDbfIds(dbfIds, options)
 ```
 
@@ -483,6 +674,16 @@ HSReplayDeckView.createSynergyItem(item, options)
 
 Возвращает DOM-элемент одного элемента цепочки внутри карточки синергии.
 
+```js
+HSReplayDeckView.createMulliganCard(mulligan, options)
+HSReplayDeckView.createMulliganItem(card, options)
+HSReplayDeckView.createMatchupRow(matchup, options)
+HSReplayDeckView.createMatchupMiniCard(card, options)
+HSReplayDeckView.createMetaBadge(badge, options)
+```
+
+Возвращают DOM-элементы новых аналитических компонентов, если нужно собрать свою обертку или вставлять элементы по одному.
+
 Основные опции:
 
 | Опция | По умолчанию | Назначение |
@@ -505,6 +706,12 @@ HSReplayDeckView.createSynergyItem(item, options)
 | `stonePortraitFrameImage` | HSReplay minion frame | URL каменной рамки |
 | `synergyArtBaseUrl` | HearthstoneJSON tiles CDN | База URL для картинок элементов синергии |
 | `synergyArtFormat` | `webp` | Формат картинок элементов синергии |
+| `mulliganArtBaseUrl` | HearthstoneJSON tiles CDN | База URL для картинок mulligan-карт |
+| `mulliganArtFormat` | `webp` | Формат картинок mulligan-карт |
+| `matchupArtBaseUrl` | HearthstoneJSON tiles CDN | База URL для маленьких карт matchup row |
+| `matchupArtFormat` | `webp` | Формат маленьких карт matchup row |
+| `matchupIconBaseUrl` | HearthstoneJSON tiles CDN | База URL для иконки противника |
+| `matchupIconFormat` | `webp` | Формат иконки противника |
 
 ## HTML-паттерн одной плитки
 
@@ -666,6 +873,97 @@ JS генерирует такую структуру:
 ```
 
 Классы цепочки намеренно отдельные от обычных квадратных иконок. Так можно независимо менять размер синергии, не ломая `renderSquareIcons`.
+
+## HTML-паттерн mulligan card
+
+```html
+<ul class="hsrdv-mulligan-list">
+  <li>
+    <article class="hsrdv-mulligan-card" aria-label="Imbue Rogue mulligan">
+      <header class="hsrdv-mulligan-header">
+        <div class="hsrdv-mulligan-title-group">
+          <h3 class="hsrdv-mulligan-title">Imbue Rogue mulligan</h3>
+          <p class="hsrdv-mulligan-subtitle">Стартовая рука против поля.</p>
+        </div>
+        <span class="hsrdv-mulligan-badge">ranked</span>
+      </header>
+
+      <div class="hsrdv-mulligan-cards">
+        <article class="hsrdv-mulligan-item hsrdv-mulligan-item--keep">
+          <span class="hsrdv-mulligan-artbox hsrdv-rarity-epic">
+            <span
+              class="hsrdv-mulligan-art"
+              style="background-image: url(&quot;https://art.hearthstonejson.com/v1/tiles/CORE_EX1_145.webp&quot;)"
+            ></span>
+          </span>
+          <span class="hsrdv-mulligan-body">
+            <strong class="hsrdv-mulligan-name">Подготовка</strong>
+            <span class="hsrdv-mulligan-status">оставлять</span>
+            <span class="hsrdv-mulligan-metrics">
+              <span class="hsrdv-mulligan-metric"><span>Keep</span><strong>74,2%</strong></span>
+              <span class="hsrdv-mulligan-metric"><span>WR</span><strong>55,8%</strong></span>
+            </span>
+          </span>
+        </article>
+      </div>
+    </article>
+  </li>
+</ul>
+```
+
+## HTML-паттерн matchup row
+
+```html
+<ul class="hsrdv-matchup-list">
+  <li>
+    <article class="hsrdv-matchup-row hsrdv-matchup-row--favored" style="--hsrdv-matchup-winrate: 56.4%">
+      <div class="hsrdv-matchup-opponent">
+        <img class="hsrdv-matchup-icon" src="https://art.hearthstonejson.com/v1/tiles/CS2_029.webp" alt="Mage">
+        <span class="hsrdv-matchup-text">
+          <strong>Spell Mage</strong>
+          <span>Mage</span>
+        </span>
+      </div>
+      <div class="hsrdv-matchup-score">
+        <strong>56,4%</strong>
+        <span>3 240 игр</span>
+      </div>
+      <div class="hsrdv-matchup-gauge">
+        <span class="hsrdv-matchup-gauge-fill"></span>
+        <span class="hsrdv-matchup-gauge-mid"></span>
+      </div>
+      <div class="hsrdv-matchup-keycards">
+        <span
+          class="hsrdv-matchup-card hsrdv-rarity-epic"
+          role="img"
+          aria-label="Подготовка ×2"
+          style="background-image: url(&quot;https://art.hearthstonejson.com/v1/tiles/CORE_EX1_145.webp&quot;)"
+        >
+          <span class="hsrdv-matchup-card-badge hsrdv-matchup-card-badge--copies">×2</span>
+        </span>
+      </div>
+    </article>
+  </li>
+</ul>
+```
+
+## HTML-паттерн tier/meta badge
+
+```html
+<ul class="hsrdv-meta-badge-list">
+  <li>
+    <article class="hsrdv-meta-badge hsrdv-meta-badge--tier-1" aria-label="Meta leader">
+      <span class="hsrdv-meta-badge-header">
+        <span class="hsrdv-meta-badge-label">Tier 1</span>
+        <span class="hsrdv-meta-badge-delta">+2,1%</span>
+      </span>
+      <strong class="hsrdv-meta-badge-title">Meta leader</strong>
+      <span class="hsrdv-meta-badge-value">56,4%</span>
+      <span class="hsrdv-meta-badge-description">Стабильный лидер с хорошими матчапами.</span>
+    </article>
+  </li>
+</ul>
+```
 
 ## Демо и скриншоты
 
