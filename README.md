@@ -1,6 +1,6 @@
 # HSReplay Deck View
 
-Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактный режим круглых иконок для списков колод.
+Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых и квадратных иконок для списков колод.
 
 Проект не требует сборки и фреймворков. Достаточно подключить CSS и JS.
 
@@ -13,6 +13,10 @@
 ### Круглые иконки
 
 ![Circle icon strip demo](assets/screenshots/icon-strip-demo.png)
+
+### Квадратные иконки
+
+![Square icon strip demo](assets/screenshots/square-strip-demo.png)
 
 ### Все редкости и стоимости 0-10
 
@@ -62,6 +66,32 @@
 #deck-icons .hsrdv {
   --hsrdv-icon-size: 54px;
   --hsrdv-icon-gap: 14px;
+}
+```
+
+## Квадратные иконки
+
+Третий режим повторяет arena/winning-decks стиль: квадратная иконка, мягкое скругление, белая боковая тень и такой же бейдж количества или легендарной звезды.
+
+```html
+<link rel="stylesheet" href="src/hsreplay-deck-view.css">
+<div id="deck-squares"></div>
+<script src="src/hsreplay-deck-view.js"></script>
+<script>
+  const deckCards = "69521,69521,69623,69623,126088";
+
+  HSReplayDeckView.renderSquareIconsFromDbfIds("#deck-squares", deckCards, {
+    locale: "ruRU"
+  });
+</script>
+```
+
+Размеры из инспектора HSReplay для 36px-иконки: `border-radius: 8px`, `background-position-x: -74.1176px`, `background-size: 133.412px 100%`. В компоненте это тоже пересчитано через переменные:
+
+```css
+#deck-squares .hsrdv {
+  --hsrdv-square-icon-size: 36px;
+  --hsrdv-square-icon-gap: 16px;
 }
 ```
 
@@ -133,6 +163,18 @@ HSReplayDeckView.renderIconsFromDbfIds(target, dbfIds, options)
 Рендерит круглые иконки из массива dbfId или строки `data-deck-cards`.
 
 ```js
+HSReplayDeckView.renderSquareIcons(target, cards, options)
+```
+
+Рендерит компактную строку квадратных иконок из готовых объектов карт.
+
+```js
+HSReplayDeckView.renderSquareIconsFromDbfIds(target, dbfIds, options)
+```
+
+Рендерит квадратные иконки из массива dbfId или строки `data-deck-cards`.
+
+```js
 HSReplayDeckView.cardsFromDbfIds(dbfIds, options)
 ```
 
@@ -149,6 +191,12 @@ HSReplayDeckView.createIcon(card, options)
 ```
 
 Возвращает DOM-элемент одной круглой иконки.
+
+```js
+HSReplayDeckView.createSquareIcon(card, options)
+```
+
+Возвращает DOM-элемент одной квадратной иконки.
 
 Основные опции:
 
@@ -198,6 +246,23 @@ JS генерирует такую структуру:
       style="background-image: url(&quot;https://art.hearthstonejson.com/v1/tiles/CORE_EX1_145.webp&quot;)"
     >
       <span class="hsrdv-card-icon-badge hsrdv-card-icon-badge--copies">×2</span>
+    </div>
+  </li>
+</ul>
+```
+
+## HTML-паттерн квадратной иконки
+
+```html
+<ul class="hsrdv-square-icon-list">
+  <li>
+    <div
+      class="hsrdv-card-square-icon hsrdv-rarity-legendary"
+      role="img"
+      aria-label="Навигатор Элиза ★"
+      style="background-image: url(&quot;https://art.hearthstonejson.com/v1/tiles/TLC_100.webp&quot;)"
+    >
+      <span class="hsrdv-card-square-badge hsrdv-card-square-badge--star">★</span>
     </div>
   </li>
 </ul>

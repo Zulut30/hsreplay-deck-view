@@ -17,6 +17,8 @@
   --hsrdv-icon-gap: 8px;
   --hsrdv-icon-art-x: -2.05882;
   --hsrdv-icon-art-scale: 3.70588;
+  --hsrdv-square-icon-size: 36px;
+  --hsrdv-square-icon-gap: 14px;
   --hsrdv-icon-badge-shadow:
     -1px -1px 0 var(--hsrdv-black),
     1px -1px 0 var(--hsrdv-black),
@@ -294,6 +296,85 @@
   filter: grayscale(1);
 }
 
+.hsrdv-square-icons {
+  width: 100%;
+}
+
+.hsrdv-square-icon-list {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  padding: 10px calc(var(--hsrdv-square-icon-size) * 0.26) calc(var(--hsrdv-square-icon-size) * 0.3) 0;
+  align-items: center;
+  gap: var(--hsrdv-square-icon-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.hsrdv-square-icon-list > li {
+  flex: 0 0 auto;
+  width: var(--hsrdv-square-icon-size);
+  height: var(--hsrdv-square-icon-size);
+  margin: 0;
+  padding: 0;
+  list-style: inherit;
+}
+
+.hsrdv-card-square-icon {
+  position: relative;
+  width: var(--hsrdv-square-icon-size);
+  height: var(--hsrdv-square-icon-size);
+  margin: 0;
+  border: 1px solid var(--hsrdv-black);
+  border-radius: 8px;
+  background-color: var(--hsrdv-frame-bg);
+  background-repeat: no-repeat;
+  background-position: calc(var(--hsrdv-square-icon-size) * var(--hsrdv-icon-art-x)) 0;
+  background-size: calc(var(--hsrdv-square-icon-size) * var(--hsrdv-icon-art-scale)) 100%;
+  box-shadow:
+    rgb(251 247 246) -1px 0 3px,
+    inset 0 0 0 1px rgb(255 255 255 / 12%);
+  color: #337ab7;
+  font-size: 1.3em;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: var(--hsrdv-icon-badge-shadow);
+  user-select: none;
+}
+
+.hsrdv-card-square-badge {
+  position: absolute;
+  z-index: 2;
+  right: calc(var(--hsrdv-square-icon-size) * -0.18);
+  bottom: calc(var(--hsrdv-square-icon-size) * -0.14);
+  color: var(--hsrdv-gold);
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: var(--hsrdv-icon-badge-shadow);
+}
+
+.hsrdv-card-square-badge--copies {
+  font-size: calc(var(--hsrdv-square-icon-size) * 0.45);
+}
+
+.hsrdv-card-square-badge--star {
+  right: calc(var(--hsrdv-square-icon-size) * -0.2);
+  bottom: calc(var(--hsrdv-square-icon-size) * -0.26);
+  font-size: calc(var(--hsrdv-square-icon-size) * 0.72);
+}
+
+.hsrdv-card-square-icon:hover {
+  filter: brightness(115%);
+}
+
+.hsrdv-card-square-icon--predicted {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
 @media (max-width: 520px) {
   .hsrdv {
     --hsrdv-tile-height: 52px;
@@ -301,6 +382,7 @@
     --hsrdv-count-width: 38px;
     --hsrdv-art-right: 34px;
     --hsrdv-icon-gap: 7px;
+    --hsrdv-square-icon-gap: 10px;
   }
 
   .hsrdv-card-cost {

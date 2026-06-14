@@ -107,10 +107,16 @@
     html[data-view="showcase"] .deck-section,
     html[data-view="deck"] .icon-section,
     html[data-view="showcase"] .icon-section,
+    html[data-view="deck"] .square-section,
+    html[data-view="showcase"] .square-section,
+    html[data-view="icons"] .square-section,
+    html[data-view="squares"] .icon-section,
     html[data-view="deck"] .demo-header,
     html[data-view="showcase"] .demo-header,
     html[data-view="icons"] .demo-header,
-    html[data-view="icons"] .demo-grid {
+    html[data-view="icons"] .demo-grid,
+    html[data-view="squares"] .demo-header,
+    html[data-view="squares"] .demo-grid {
       display: none;
     }
 
@@ -126,12 +132,20 @@
       padding-top: 4px;
     }
 
+    html[data-view="squares"] .demo-shell {
+      width: min(1564px, 100vw);
+      padding: 8px 0 0;
+    }
+
     html[data-view="icons"] .icon-section > h2,
-    html[data-view="icons"] .icon-section > .demo-note {
+    html[data-view="icons"] .icon-section > .demo-note,
+    html[data-view="squares"] .square-section > h2,
+    html[data-view="squares"] .square-section > .demo-note {
       display: none;
     }
 
-    .icon-section {
+    .icon-section,
+    .square-section {
       margin-bottom: 28px;
     }
 
@@ -242,6 +256,40 @@
       max-width: none;
     }
 
+    .square-row-card {
+      min-height: 145px;
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #f0f1f3;
+      border-top: 1px solid #b8b8b8;
+      border-bottom: 1px solid #b8b8b8;
+      box-shadow:
+        inset 0 12px 18px rgb(0 0 0 / 13%),
+        0 8px 22px rgb(26 41 64 / 10%);
+    }
+
+    .square-row-card .demo-loading,
+    .square-row-card .demo-error {
+      width: 100%;
+      min-height: 52px;
+    }
+
+    .square-row-card .hsrdv {
+      --hsrdv-square-icon-size: 36px;
+      --hsrdv-square-icon-gap: 16px;
+      max-width: none;
+    }
+
+    .square-row-card .hsrdv-square-icon-list {
+      justify-content: center;
+      padding-top: 4px;
+      padding-bottom: 10px;
+      overflow-x: hidden;
+    }
+
     @media (max-width: 760px) {
       .deck-row-summary {
         flex-direction: column;
@@ -266,6 +314,19 @@
       .deck-row-icons .hsrdv {
         --hsrdv-icon-size: 30px;
         --hsrdv-icon-gap: 8px;
+      }
+
+      .square-row-card {
+        justify-content: flex-start;
+      }
+
+      .square-row-card .hsrdv {
+        --hsrdv-square-icon-gap: 12px;
+      }
+
+      .square-row-card .hsrdv-square-icon-list {
+        justify-content: flex-start;
+        overflow-x: auto;
       }
     }
 
@@ -319,6 +380,17 @@
       </article>
       <p class="demo-note">
         Это тот же набор карт, но в режиме круглых иконок: <code>renderIconsFromDbfIds</code>.
+      </p>
+    </section>
+
+    <section class="demo-section square-section" aria-labelledby="squares-title">
+      <h2 id="squares-title">Square icon strip</h2>
+      <article class="square-row-card">
+        <div id="sample-squares" class="demo-loading">Loading HearthstoneJSON...</div>
+      </article>
+      <p class="demo-note">
+        Третий вариант использует квадратные иконки: <code>renderSquareIconsFromDbfIds</code>.
+        У копий справа стоит <code>×2</code>, у одиночных легендарок — <code>★</code>.
       </p>
     </section>
 
@@ -387,6 +459,7 @@
 
     const sampleDeckElement = document.querySelector("#sample-deck");
     const sampleIconsElement = document.querySelector("#sample-icons");
+    const sampleSquaresElement = document.querySelector("#sample-squares");
 
     HSReplayDeckView.cardsFromDbfIds(DECK_DBF_IDS, {
       locale: "ruRU"
@@ -396,12 +469,17 @@
         HSReplayDeckView.renderIcons("#sample-icons", cards, {
           className: "sample-icons-strip"
         });
+        HSReplayDeckView.renderSquareIcons("#sample-squares", cards, {
+          className: "sample-square-strip"
+        });
         sampleDeckElement.className = "";
         sampleIconsElement.className = "";
+        sampleSquaresElement.className = "";
       })
       .catch((error) => {
         showError("#sample-deck", error);
         showError("#sample-icons", error);
+        showError("#sample-squares", error);
       });
 
     HSReplayDeckView.renderDeck("#rarity-showcase", RARITY_CARDS, {

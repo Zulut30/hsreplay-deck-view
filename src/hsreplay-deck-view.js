@@ -255,6 +255,38 @@
     return icon;
   }
 
+  function createSquareIcon(rawCard, options) {
+    const card = normalizeCard(rawCard);
+    const settings = withDefaults(options);
+    const badgeLabel = getIconBadgeLabel(card, settings);
+    const icon = createElement(
+      "div",
+      `hsrdv-card-square-icon hsrdv-rarity-${card.rarity}${card.predicted ? " hsrdv-card-square-icon--predicted" : ""}`
+    );
+    icon.setAttribute("role", "img");
+    icon.setAttribute("aria-label", badgeLabel ? `${card.name} ${badgeLabel}` : card.name);
+    if (card.dbfId) {
+      icon.dataset.dbfId = String(card.dbfId);
+    }
+    if (card.id) {
+      icon.dataset.cardId = card.id;
+    }
+
+    const artUrl = getArtUrl(card, settings);
+    if (artUrl) {
+      icon.style.backgroundImage = `url("${artUrl}")`;
+    }
+
+    if (badgeLabel) {
+      const badgeClass = badgeLabel === "★"
+        ? "hsrdv-card-square-badge hsrdv-card-square-badge--star"
+        : "hsrdv-card-square-badge hsrdv-card-square-badge--copies";
+      icon.appendChild(createElement("span", badgeClass, badgeLabel));
+    }
+
+    return icon;
+  }
+
   function renderDeck(target, cards, options) {
     const settings = withDefaults(options);
     const container = resolveTarget(target);
@@ -287,6 +319,28 @@
     renderCards.forEach((card) => {
       const item = createElement("li");
       item.appendChild(createIcon(card, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
+  function renderSquareIcons(target, cards, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const renderCards = prepareCards(cards, settings);
+    const rootElement = createElement("div", `hsrdv hsrdv-square-icons ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-square-icon-list");
+
+    renderCards.forEach((card) => {
+      const item = createElement("li");
+      item.appendChild(createSquareIcon(card, settings));
       list.appendChild(item);
     });
 
@@ -336,8 +390,14 @@
     return renderIcons(target, cards, options);
   }
 
+  async function renderSquareIconsFromDbfIds(target, dbfIds, options) {
+    const cards = await cardsFromDbfIds(dbfIds, options);
+    return renderSquareIcons(target, cards, options);
+  }
+
   return {
     createIcon,
+    createSquareIcon,
     createTile,
     cardsFromDbfIds,
     groupCards,
@@ -348,6 +408,8 @@
     renderDeckFromDbfIds,
     renderIcons,
     renderIconsFromDbfIds,
+    renderSquareIcons,
+    renderSquareIconsFromDbfIds,
     sortCards
   };
 });
