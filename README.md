@@ -104,8 +104,8 @@ GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
 
 ```css
 #deck-squares .hsrdv {
-  --hsrdv-square-icon-size: 36px;
-  --hsrdv-square-icon-gap: 16px;
+  --hsrdv-square-icon-size: 58px;
+  --hsrdv-square-icon-gap: 20px;
 }
 ```
 

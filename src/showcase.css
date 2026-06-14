@@ -276,8 +276,8 @@ p {
 }
 
 .squares-preview .hsrdv {
-  --hsrdv-square-icon-size: 44px;
-  --hsrdv-square-icon-gap: 12px;
+  --hsrdv-square-icon-size: 54px;
+  --hsrdv-square-icon-gap: 16px;
 }
 
 .squares-preview .hsrdv-square-icon-list {
@@ -369,23 +369,24 @@ p {
 }
 
 .square-ribbon {
-  min-height: 132px;
+  min-height: 166px;
   display: grid;
   align-items: center;
   overflow: hidden;
-  padding: 20px 18px;
+  padding: 26px 22px;
   background:
     linear-gradient(180deg, rgb(245 246 248), rgb(232 235 240));
 }
 
 .square-ribbon .hsrdv {
-  --hsrdv-square-icon-size: 42px;
-  --hsrdv-square-icon-gap: 14px;
+  --hsrdv-square-icon-size: 58px;
+  --hsrdv-square-icon-gap: 20px;
 }
 
 .square-ribbon .hsrdv-square-icon-list {
   justify-content: center;
-  padding-top: 4px;
+  padding-top: 8px;
+  padding-bottom: 20px;
   overflow-x: auto;
 }
 

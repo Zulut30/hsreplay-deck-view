@@ -107,7 +107,7 @@
       group: false,
       sort: false
     });
-    api.renderSquareIcons("#hero-squares", DECK_CARDS.slice(3, 14), {
+    api.renderSquareIcons("#hero-squares", DECK_CARDS.slice(3, 12), {
       group: false,
       sort: false
     });
