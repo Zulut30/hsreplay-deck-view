@@ -254,7 +254,8 @@ p {
 .synergy-preview,
 .mulligan-preview,
 .matchup-preview,
-.meta-preview {
+.meta-preview,
+.cost-curve-preview {
   min-width: 0;
 }
 
@@ -266,6 +267,7 @@ p {
 .mulligan-preview .hsrdv,
 .matchup-preview .hsrdv,
 .meta-preview .hsrdv,
+.cost-curve-preview .hsrdv,
 .deck-row-strip .hsrdv,
 .square-ribbon .hsrdv,
 .archetype-board .hsrdv,
@@ -273,7 +275,8 @@ p {
 .synergy-board .hsrdv,
 .mulligan-board .hsrdv,
 .matchup-board .hsrdv,
-.meta-board .hsrdv {
+.meta-board .hsrdv,
+.cost-curve-board .hsrdv {
   max-width: none;
 }
 
@@ -403,6 +406,22 @@ p {
   display: none;
 }
 
+.cost-curve-preview .hsrdv {
+  --hsrdv-cost-curve-width: 100%;
+  --hsrdv-cost-curve-height: 72px;
+  --hsrdv-cost-curve-gap: 5px;
+}
+
+.cost-curve-preview .hsrdv-cost-curve {
+  padding: 12px;
+  box-shadow: none;
+}
+
+.cost-curve-preview .hsrdv-cost-curve-subtitle,
+.cost-curve-preview .hsrdv-cost-curve-footer {
+  display: none;
+}
+
 .detail-section,
 .reference-section,
 .api-section {
@@ -431,6 +450,7 @@ p {
 .mulligan-board,
 .matchup-board,
 .meta-board,
+.cost-curve-board,
 .api-section pre {
   min-width: 0;
   border: 1px solid var(--site-line);
@@ -562,7 +582,8 @@ p {
 
 .mulligan-board,
 .matchup-board,
-.meta-board {
+.meta-board,
+.cost-curve-board {
   padding: 18px;
   background:
     linear-gradient(180deg, rgb(248 250 252), rgb(232 237 243));
@@ -581,6 +602,12 @@ p {
 
 .meta-board .hsrdv {
   --hsrdv-meta-badge-width: 100%;
+}
+
+.cost-curve-board .hsrdv {
+  --hsrdv-cost-curve-width: 100%;
+  --hsrdv-cost-curve-height: 108px;
+  --hsrdv-cost-curve-gap: 8px;
 }
 
 .reference-grid {
@@ -714,12 +741,18 @@ p {
 
   .mulligan-board,
   .matchup-board,
-  .meta-board {
+  .meta-board,
+  .cost-curve-board {
     padding: 12px;
   }
 
   .mulligan-board .hsrdv {
     --hsrdv-mulligan-art-size: 54px;
+  }
+
+  .cost-curve-board .hsrdv {
+    --hsrdv-cost-curve-height: 90px;
+    --hsrdv-cost-curve-gap: 5px;
   }
 }
 
@@ -732,6 +765,7 @@ html[data-view="synergies"] .site-top,
 html[data-view="mulligans"] .site-top,
 html[data-view="matchups"] .site-top,
 html[data-view="meta-badges"] .site-top,
+html[data-view="cost-curve"] .site-top,
 html[data-view="showcase"] .site-top,
 html[data-view="deck"] .site-footer,
 html[data-view="icons"] .site-footer,
@@ -742,6 +776,7 @@ html[data-view="synergies"] .site-footer,
 html[data-view="mulligans"] .site-footer,
 html[data-view="matchups"] .site-footer,
 html[data-view="meta-badges"] .site-footer,
+html[data-view="cost-curve"] .site-footer,
 html[data-view="showcase"] .site-footer {
   display: none;
 }
@@ -755,6 +790,7 @@ html[data-view="synergies"] .site-main,
 html[data-view="mulligans"] .site-main,
 html[data-view="matchups"] .site-main,
 html[data-view="meta-badges"] .site-main,
+html[data-view="cost-curve"] .site-main,
 html[data-view="showcase"] .site-main {
   width: min(100vw - 16px, 1180px);
   padding: 4px 0 0;
@@ -769,6 +805,7 @@ html[data-view="synergies"] .site-section,
 html[data-view="mulligans"] .site-section,
 html[data-view="matchups"] .site-section,
 html[data-view="meta-badges"] .site-section,
+html[data-view="cost-curve"] .site-section,
 html[data-view="showcase"] .site-section {
   margin-top: 0;
 }
@@ -782,6 +819,7 @@ html[data-view="synergies"] .site-section:not(#synergies),
 html[data-view="mulligans"] .site-section:not(#mulligans),
 html[data-view="matchups"] .site-section:not(#matchups),
 html[data-view="meta-badges"] .site-section:not(#meta-badges),
+html[data-view="cost-curve"] .site-section:not(#cost-curve),
 html[data-view="showcase"] .site-section:not(#reference) {
   display: none;
 }
@@ -795,6 +833,7 @@ html[data-view="synergies"] .section-copy,
 html[data-view="mulligans"] .section-copy,
 html[data-view="matchups"] .section-copy,
 html[data-view="meta-badges"] .section-copy,
+html[data-view="cost-curve"] .section-copy,
 html[data-view="showcase"] .section-copy {
   display: none;
 }
@@ -808,6 +847,7 @@ html[data-view="synergies"] .detail-section,
 html[data-view="mulligans"] .detail-section,
 html[data-view="matchups"] .detail-section,
 html[data-view="meta-badges"] .detail-section,
+html[data-view="cost-curve"] .detail-section,
 html[data-view="showcase"] .reference-section {
   display: block;
   padding-top: 0;
@@ -825,6 +865,7 @@ html[data-view="synergies"] .synergy-board,
 html[data-view="mulligans"] .mulligan-board,
 html[data-view="matchups"] .matchup-board,
 html[data-view="meta-badges"] .meta-board,
+html[data-view="cost-curve"] .cost-curve-board,
 html[data-view="showcase"] .reference-grid {
   box-shadow: none;
 }

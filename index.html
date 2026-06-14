@@ -6,7 +6,7 @@
   <title>HSReplay Deck View Components</title>
   <meta
     name="description"
-    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, архетипы, портреты Battlegrounds, синергии, mulligan, matchups и meta badges."
+    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, архетипы, портреты Battlegrounds, синергии, mulligan, matchups, meta badges и mana curve."
   >
   <script>
     document.documentElement.dataset.view = new URLSearchParams(location.search).get("view") || "all";
@@ -37,6 +37,7 @@
       <a href="#mulligans">Mulligan</a>
       <a href="#matchups">Matchups</a>
       <a href="#meta-badges">Meta</a>
+      <a href="#cost-curve">Curve</a>
       <a href="#api">API</a>
       <a class="site-nav-github" href="https://github.com/Zulut30/hsreplay-deck-view">GitHub</a>
     </nav>
@@ -124,6 +125,14 @@
             <strong>meta labels</strong>
           </div>
           <div id="hero-meta" class="meta-preview"></div>
+        </article>
+
+        <article class="component-card component-card--cost-curve">
+          <div class="component-card-head">
+            <span>Deck cost curve</span>
+            <strong>mana histogram</strong>
+          </div>
+          <div id="hero-cost-curve" class="cost-curve-preview"></div>
         </article>
       </div>
     </section>
@@ -258,6 +267,20 @@
       </div>
     </section>
 
+    <section id="cost-curve" class="site-section detail-section detail-section--wide" aria-labelledby="cost-curve-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 10</div>
+        <h2 id="cost-curve-title">Deck cost curve</h2>
+        <p>
+          Маленькая mana curve-гистограмма для карточки колоды: столбцы `0-7+`,
+          количество карт сверху и средняя стоимость внизу.
+        </p>
+      </div>
+      <div class="cost-curve-board">
+        <div id="sample-cost-curves"></div>
+      </div>
+    </section>
+
     <section id="reference" class="site-section reference-section" aria-labelledby="reference-title">
       <div class="section-copy">
         <div class="section-kicker">Reference</div>
@@ -298,6 +321,7 @@
   HSReplayDeckView.renderMulligans("#mulligans", mulligans);
   HSReplayDeckView.renderMatchups("#matchups", matchups);
   HSReplayDeckView.renderMetaBadges("#badges", badges);
+  HSReplayDeckView.renderCostCurve("#curve", cards);
 &lt;/script&gt;</code></pre>
     </section>
   </main>

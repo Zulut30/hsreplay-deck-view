@@ -201,6 +201,20 @@
     { kind: "falling", label: "Falling", title: "Losing ground", value: "-9%", delta: "down", description: "Сдает позиции из-за новых контр-колод и плохих матчапов." }
   ];
 
+  const COST_CURVES = [
+    {
+      title: "Imbue Rogue curve",
+      subtitle: "Низкая кривая с несколькими поздними payoff-картами.",
+      badge: "30 cards",
+      buckets: [5, 8, 7, 3, 2, 1, 1, 3]
+    },
+    {
+      title: "From card objects",
+      subtitle: "Та же гистограмма может считаться прямо из массива карт.",
+      cards: DECK_CARDS
+    }
+  ];
+
   function render() {
     const api = window.HSReplayDeckView;
     if (!api) {
@@ -229,6 +243,7 @@
     api.renderMulligans("#hero-mulligan", MULLIGANS.slice(0, 1));
     api.renderMatchups("#hero-matchup", MATCHUPS.slice(0, 2));
     api.renderMetaBadges("#hero-meta", META_BADGES.slice(0, 3));
+    api.renderCostCurve("#hero-cost-curve", COST_CURVES[0]);
 
     api.renderDeck("#sample-deck", DECK_CARDS, {
       group: false,
@@ -248,6 +263,7 @@
     api.renderMulligans("#sample-mulligans", MULLIGANS);
     api.renderMatchups("#sample-matchups", MATCHUPS);
     api.renderMetaBadges("#sample-meta-badges", META_BADGES);
+    api.renderCostCurves("#sample-cost-curves", COST_CURVES);
 
     api.renderDeck("#rarity-showcase", RARITY_CARDS, {
       group: false,

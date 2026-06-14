@@ -34,7 +34,10 @@
     matchupArtBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
     matchupArtFormat: "webp",
     matchupIconBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
-    matchupIconFormat: "webp"
+    matchupIconFormat: "webp",
+    costCurveMaxCost: 7,
+    costCurveOverLabel: "7+",
+    costCurveShowTotal: true
   };
 
   const RARITY_ORDER = {
@@ -679,6 +682,126 @@
     };
   }
 
+  function getCostCurveMaxCost(rawMaxCost, options) {
+    const parsed = Number(rawMaxCost ?? options.costCurveMaxCost);
+    return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : 7;
+  }
+
+  function createEmptyCostBuckets(maxCost, overLabel) {
+    return Array.from({ length: maxCost + 1 }, (_, cost) => ({
+      cost,
+      label: cost === maxCost ? overLabel : String(cost),
+      count: 0
+    }));
+  }
+
+  function normalizeCostBucketCost(value, index, maxCost) {
+    if (typeof value === "string" && value.includes("+")) {
+      return maxCost;
+    }
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return Math.max(0, Math.min(maxCost, Math.floor(parsed)));
+    }
+    return Math.max(0, Math.min(maxCost, index));
+  }
+
+  function normalizeCostCurveBuckets(input, maxCost, overLabel) {
+    const buckets = createEmptyCostBuckets(maxCost, overLabel);
+    if (!input) {
+      return null;
+    }
+
+    if (Array.isArray(input)) {
+      input.forEach((bucket, index) => {
+        if (Number.isFinite(Number(bucket))) {
+          buckets[Math.min(index, maxCost)].count += Math.max(0, Number(bucket));
+          return;
+        }
+        const raw = bucket || {};
+        const cost = normalizeCostBucketCost(raw.cost ?? raw.mana ?? raw.label, index, maxCost);
+        buckets[cost].count += Math.max(0, Number(raw.count ?? raw.value ?? raw.cards ?? 0));
+        if (raw.label) {
+          buckets[cost].label = String(raw.label);
+        }
+      });
+      return buckets;
+    }
+
+    if (typeof input === "object") {
+      Object.entries(input).forEach(([key, value], index) => {
+        const cost = normalizeCostBucketCost(key, index, maxCost);
+        buckets[cost].count += Math.max(0, Number(value));
+        if (key.includes("+")) {
+          buckets[cost].label = key;
+        }
+      });
+      return buckets;
+    }
+
+    return null;
+  }
+
+  function buildCostCurveBuckets(cards, maxCost, overLabel) {
+    const buckets = createEmptyCostBuckets(maxCost, overLabel);
+    (cards || []).forEach((rawCard) => {
+      const card = normalizeCard(rawCard);
+      const cost = Math.max(0, Math.floor(Number(card.cost) || 0));
+      const bucketCost = Math.min(cost, maxCost);
+      buckets[bucketCost].count += Math.max(1, Number(card.count || 1));
+    });
+    return buckets;
+  }
+
+  function normalizeCostCurve(curve, options) {
+    const settings = withDefaults(options);
+    if (Array.isArray(curve)) {
+      const maxCost = getCostCurveMaxCost(null, settings);
+      return {
+        title: "Mana curve",
+        subtitle: "",
+        badge: "",
+        cards: curve,
+        buckets: null,
+        maxCost,
+        overLabel: settings.costCurveOverLabel || `${maxCost}+`,
+        url: "",
+        label: "Mana curve"
+      };
+    }
+
+    const raw = curve || {};
+    const maxCost = getCostCurveMaxCost(raw.maxCost ?? raw.maxMana, settings);
+    const overLabel = raw.overLabel
+      || raw.maxLabel
+      || (maxCost === settings.costCurveMaxCost ? settings.costCurveOverLabel : `${maxCost}+`)
+      || `${maxCost}+`;
+    return {
+      title: raw.title || raw.name || "Mana curve",
+      subtitle: raw.subtitle || raw.description || raw.text || "",
+      badge: raw.badge || raw.tag || "",
+      cards: parseCardItems(raw.cards || raw.deck || raw.items),
+      buckets: normalizeCostCurveBuckets(raw.buckets || raw.curve || raw.costs, maxCost, overLabel),
+      maxCost,
+      overLabel,
+      url: raw.url || raw.href || "",
+      label: raw.label || raw.ariaLabel || raw.title || raw.name || "Mana curve"
+    };
+  }
+
+  function getCostCurveStats(curve) {
+    const buckets = curve.buckets || buildCostCurveBuckets(curve.cards, curve.maxCost, curve.overLabel);
+    const total = buckets.reduce((sum, bucket) => sum + bucket.count, 0);
+    const weightedCost = buckets.reduce((sum, bucket) => sum + (bucket.cost * bucket.count), 0);
+    const maxCount = Math.max(1, ...buckets.map((bucket) => bucket.count));
+    return {
+      buckets,
+      total,
+      average: total ? weightedCost / total : 0,
+      maxCount
+    };
+  }
+
   function createTile(rawCard, options) {
     const card = normalizeCard(rawCard);
     const settings = withDefaults(options);
@@ -1197,6 +1320,62 @@
     return element;
   }
 
+  function createCostCurve(rawCurve, options) {
+    const settings = withDefaults(options);
+    const curve = normalizeCostCurve(rawCurve, settings);
+    const stats = getCostCurveStats(curve);
+    const element = createElement(
+      curve.url ? "a" : "article",
+      "hsrdv-cost-curve"
+    );
+    element.setAttribute("aria-label", curve.label || curve.title);
+    if (curve.url) {
+      element.href = curve.url;
+    }
+
+    const header = createElement("header", "hsrdv-cost-curve-header");
+    const titleGroup = createElement("div", "hsrdv-cost-curve-title-group");
+    titleGroup.appendChild(createElement("h3", "hsrdv-cost-curve-title", curve.title));
+    if (curve.subtitle) {
+      titleGroup.appendChild(createElement("p", "hsrdv-cost-curve-subtitle", curve.subtitle));
+    }
+    header.appendChild(titleGroup);
+
+    const badge = curve.badge || (settings.costCurveShowTotal ? `${stats.total} cards` : "");
+    if (badge) {
+      header.appendChild(createElement("span", "hsrdv-cost-curve-badge", badge));
+    }
+    element.appendChild(header);
+
+    const chart = createElement("div", "hsrdv-cost-curve-chart");
+    chart.setAttribute("role", "img");
+    chart.setAttribute("aria-label", `Mana curve, ${stats.total} cards`);
+    chart.style.setProperty("--hsrdv-cost-curve-columns", String(stats.buckets.length));
+    stats.buckets.forEach((bucket) => {
+      const ratio = bucket.count / stats.maxCount;
+      const bucketElement = createElement("span", "hsrdv-cost-curve-bucket");
+      bucketElement.style.setProperty("--hsrdv-cost-curve-ratio", String(ratio));
+      bucketElement.setAttribute("aria-label", `${bucket.label} mana: ${bucket.count}`);
+
+      bucketElement.appendChild(createElement("span", "hsrdv-cost-curve-count", String(bucket.count)));
+      const bar = createElement("span", "hsrdv-cost-curve-bar");
+      bar.appendChild(createElement("span", "hsrdv-cost-curve-fill"));
+      bucketElement.appendChild(bar);
+      bucketElement.appendChild(createElement("span", "hsrdv-cost-curve-label", bucket.label));
+      chart.appendChild(bucketElement);
+    });
+    element.appendChild(chart);
+
+    const footer = createElement("footer", "hsrdv-cost-curve-footer");
+    footer.appendChild(createElement("span", "", `Avg ${stats.average.toLocaleString("ru-RU", {
+      maximumFractionDigits: 1,
+      minimumFractionDigits: 1
+    })}`));
+    footer.appendChild(createElement("span", "", `${stats.total} cards`));
+    element.appendChild(footer);
+    return element;
+  }
+
   function renderDeck(target, cards, options) {
     const settings = withDefaults(options);
     const container = resolveTarget(target);
@@ -1396,6 +1575,40 @@
     return rootElement;
   }
 
+  function renderCostCurve(target, curve, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const rootElement = createElement("div", `hsrdv hsrdv-cost-curves ${settings.className}`.trim());
+    rootElement.appendChild(createCostCurve(curve, settings));
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
+  function renderCostCurves(target, curves, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const rootElement = createElement("div", `hsrdv hsrdv-cost-curves ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-cost-curve-list");
+
+    (curves || []).forEach((curve) => {
+      const item = createElement("li");
+      item.appendChild(createCostCurve(curve, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
   async function loadCardDatabase(options) {
     const settings = withDefaults(options);
     const url = settings.dataUrl.replace("{locale}", settings.locale);
@@ -1443,8 +1656,14 @@
     return renderStonePortraits(target, cards, options);
   }
 
+  async function renderCostCurveFromDbfIds(target, dbfIds, options) {
+    const cards = await cardsFromDbfIds(dbfIds, options);
+    return renderCostCurve(target, cards, options);
+  }
+
   return {
     createArchetypeCard,
+    createCostCurve,
     createIcon,
     createMatchupMiniCard,
     createMatchupRow,
@@ -1460,6 +1679,7 @@
     groupCards,
     loadCardDatabase,
     normalizeCard,
+    normalizeCostCurve,
     normalizeMatchup,
     normalizeMatchupCard,
     normalizeMetaBadge,
@@ -1469,6 +1689,9 @@
     normalizeSynergy,
     normalizeSynergyItem,
     parseDeckCards,
+    renderCostCurve,
+    renderCostCurveFromDbfIds,
+    renderCostCurves,
     renderDeck,
     renderDeckFromDbfIds,
     renderArchetypes,
