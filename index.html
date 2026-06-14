@@ -3,552 +3,208 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HSReplay deck view pattern</title>
+  <title>HSReplay Deck View Components</title>
+  <meta
+    name="description"
+    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, карточки архетипов."
+  >
   <script>
     document.documentElement.dataset.view = new URLSearchParams(location.search).get("view") || "all";
   </script>
-  <link rel="preconnect" href="https://api.hearthstonejson.com">
   <link rel="preconnect" href="https://art.hearthstonejson.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://art.hearthstonejson.com/v1/tiles/AT_072.webp">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/hsreplay-deck-view.css">
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      min-height: 100%;
-    }
-
-    body {
-      background: #f4f6f8;
-      color: #152033;
-      font-family: "Noto Sans", Arial, sans-serif;
-    }
-
-    .demo-shell {
-      width: min(1120px, calc(100vw - 28px));
-      margin: 0 auto;
-      padding: 28px 0 40px;
-    }
-
-    .demo-header {
-      margin-bottom: 22px;
-    }
-
-    .demo-header h1 {
-      margin: 0;
-      font-size: clamp(1.5rem, 4vw, 2.4rem);
-      line-height: 1.05;
-    }
-
-    .demo-header p {
-      max-width: 720px;
-      margin: 8px 0 0;
-      color: #4b5566;
-      font-size: 1rem;
-      line-height: 1.45;
-    }
-
-    .demo-grid {
-      display: grid;
-      grid-template-columns: minmax(300px, 486px) minmax(300px, 486px);
-      gap: 26px;
-      align-items: start;
-    }
-
-    .demo-section {
-      min-width: 0;
-    }
-
-    .demo-section h2 {
-      margin: 0 0 12px;
-      color: #1a2940;
-      font-size: 1.1rem;
-      line-height: 1.2;
-    }
-
-    .demo-note {
-      margin: 12px 0 0;
-      color: #5e6877;
-      font-size: 0.9rem;
-      line-height: 1.45;
-    }
-
-    .demo-stack {
-      display: grid;
-      gap: 24px;
-    }
-
-    .demo-loading,
-    .demo-error {
-      width: min(100%, 486px);
-      min-height: 62px;
-      display: grid;
-      place-items: center;
-      padding: 12px;
-      background: #e8edf2;
-      border: 1px solid #cbd5df;
-      color: #344055;
-      font-weight: 700;
-    }
-
-    .demo-error {
-      border-color: #b84848;
-      color: #8f2929;
-      background: #f9eaea;
-    }
-
-    html[data-view="deck"] .showcase-section,
-    html[data-view="showcase"] .deck-section,
-    html[data-view="deck"] .icon-section,
-    html[data-view="showcase"] .icon-section,
-    html[data-view="deck"] .square-section,
-    html[data-view="showcase"] .square-section,
-    html[data-view="deck"] .archetype-section,
-    html[data-view="showcase"] .archetype-section,
-    html[data-view="icons"] .square-section,
-    html[data-view="icons"] .archetype-section,
-    html[data-view="squares"] .icon-section,
-    html[data-view="squares"] .archetype-section,
-    html[data-view="archetypes"] .icon-section,
-    html[data-view="archetypes"] .square-section,
-    html[data-view="archetypes"] .demo-grid,
-    html[data-view="deck"] .demo-header,
-    html[data-view="showcase"] .demo-header,
-    html[data-view="icons"] .demo-header,
-    html[data-view="icons"] .demo-grid,
-    html[data-view="squares"] .demo-header,
-    html[data-view="squares"] .demo-grid,
-    html[data-view="archetypes"] .demo-header {
-      display: none;
-    }
-
-    html[data-view="deck"] .demo-grid,
-    html[data-view="showcase"] .demo-grid {
-      display: block;
-      width: min(100%, 486px);
-      margin: 0 auto;
-    }
-
-    html[data-view="icons"] .demo-shell {
-      width: min(1320px, calc(100vw - 16px));
-      padding-top: 4px;
-    }
-
-    html[data-view="squares"] .demo-shell {
-      width: min(1564px, 100vw);
-      padding: 8px 0 0;
-    }
-
-    html[data-view="archetypes"] .demo-shell {
-      width: min(840px, calc(100vw - 16px));
-      padding: 4px 0 0;
-    }
-
-    html[data-view="icons"] .icon-section > h2,
-    html[data-view="icons"] .icon-section > .demo-note,
-    html[data-view="squares"] .square-section > h2,
-    html[data-view="squares"] .square-section > .demo-note,
-    html[data-view="archetypes"] .archetype-section > h2,
-    html[data-view="archetypes"] .archetype-section > .demo-note {
-      display: none;
-    }
-
-    .icon-section,
-    .square-section,
-    .archetype-section {
-      margin-bottom: 28px;
-    }
-
-    .deck-row-card {
-      width: 100%;
-      overflow: hidden;
-      background: #eef0f3;
-      border: 1px solid #aaa;
-      border-radius: 6px;
-      box-shadow: 0 14px 28px rgb(26 41 64 / 14%);
-    }
-
-    .deck-row-summary {
-      min-height: 122px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 28px;
-      padding: 26px 88px 22px 24px;
-      background:
-        linear-gradient(90deg, rgb(255 255 255 / 74%) 0%, rgb(255 255 255 / 90%) 42%, rgb(238 238 241 / 96%) 100%),
-        url("https://art.hearthstonejson.com/v1/tiles/TLC_100.webp") 70px 40% / 350px auto no-repeat;
-      border-bottom: 6px solid #f12b1d;
-    }
-
-    .deck-row-identity {
-      display: flex;
-      min-width: 285px;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .deck-row-class-icon {
-      width: 54px;
-      height: 54px;
-      flex: 0 0 auto;
-      border: 2px solid #5a5036;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 50%, rgb(255 255 255 / 18%) 0 32%, transparent 33%),
-        url("https://art.hearthstonejson.com/v1/tiles/CORE_EX1_145.webp") -98px 0 / 198px 100% no-repeat;
-      box-shadow:
-        inset 0 0 0 3px #1d1b17,
-        0 1px 2px rgb(0 0 0 / 40%);
-    }
-
-    .deck-row-identity h3 {
-      margin: 0;
-      color: #050505;
-      font-size: 1.75rem;
-      line-height: 1.05;
-    }
-
-    .deck-row-identity p {
-      margin: 8px 0 0;
-      color: #4a4a4d;
-      font-size: 1.25rem;
-      font-weight: 800;
-    }
-
-    .deck-row-stats {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(120px, 1fr));
-      gap: 36px;
-      margin: 0;
-      text-align: center;
-    }
-
-    .deck-row-stats div,
-    .deck-row-stats dt,
-    .deck-row-stats dd {
-      margin: 0;
-    }
-
-    .deck-row-stats dt {
-      color: #5e5e62;
-      font-size: 1.25rem;
-      font-weight: 400;
-    }
-
-    .deck-row-stats dd {
-      margin-top: 8px;
-      color: #000;
-      font-size: 1.85rem;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .deck-row-stats .deck-row-winrate {
-      color: #c49321;
-    }
-
-    .deck-row-icons {
-      padding: 8px 22px 4px;
-      background: #eef0f3;
-    }
-
-    .deck-row-icons .demo-loading,
-    .deck-row-icons .demo-error {
-      width: 100%;
-      min-height: 48px;
-    }
-
-    .deck-row-icons .hsrdv {
-      --hsrdv-icon-size: 30px;
-      --hsrdv-icon-gap: 12px;
-      max-width: none;
-    }
-
-    .square-row-card {
-      min-height: 145px;
-      display: flex;
-      width: 100%;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      background: #f0f1f3;
-      border-top: 1px solid #b8b8b8;
-      border-bottom: 1px solid #b8b8b8;
-      box-shadow:
-        inset 0 12px 18px rgb(0 0 0 / 13%),
-        0 8px 22px rgb(26 41 64 / 10%);
-    }
-
-    .square-row-card .demo-loading,
-    .square-row-card .demo-error {
-      width: 100%;
-      min-height: 52px;
-    }
-
-    .square-row-card .hsrdv {
-      --hsrdv-square-icon-size: 36px;
-      --hsrdv-square-icon-gap: 16px;
-      max-width: none;
-    }
-
-    .square-row-card .hsrdv-square-icon-list {
-      justify-content: center;
-      padding-top: 4px;
-      padding-bottom: 10px;
-      overflow-x: hidden;
-    }
-
-    .archetype-row-card {
-      width: 100%;
-      overflow: hidden;
-      background: #eef1f5;
-      border-top: 1px solid #b8b8b8;
-      border-bottom: 1px solid #b8b8b8;
-      box-shadow:
-        inset 0 8px 14px rgb(0 0 0 / 10%),
-        0 8px 22px rgb(26 41 64 / 10%);
-    }
-
-    .archetype-row-card .hsrdv {
-      --hsrdv-archetype-height: 70px;
-      --hsrdv-archetype-art-opacity: 0.42;
-      max-width: none;
-    }
-
-    @media (max-width: 760px) {
-      .deck-row-summary {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 22px;
-      }
-
-      .deck-row-stats {
-        width: 100%;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-      }
-
-      .deck-row-stats dt {
-        font-size: 0.88rem;
-      }
-
-      .deck-row-stats dd {
-        font-size: 1.25rem;
-      }
-
-      .deck-row-icons .hsrdv {
-        --hsrdv-icon-size: 30px;
-        --hsrdv-icon-gap: 8px;
-      }
-
-      .square-row-card {
-        justify-content: flex-start;
-      }
-
-      .square-row-card .hsrdv {
-        --hsrdv-square-icon-gap: 12px;
-      }
-
-      .square-row-card .hsrdv-square-icon-list {
-        justify-content: flex-start;
-        overflow-x: auto;
-      }
-    }
-
-    @media (max-width: 860px) {
-      .demo-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="src/showcase.css">
 </head>
 <body>
-  <main class="demo-shell">
-    <header class="demo-header">
-      <h1>HSReplay deck view pattern</h1>
-      <p>
-        Переиспользуемый HTML/CSS/JS-паттерн для Hearthstone-плиток в стиле HSReplay:
-        стоимость слева, затемненный tile-art, название с ellipsis, счетчик или звезда справа,
-        а также компактная строка круглых иконок.
-      </p>
-    </header>
+  <header class="site-top">
+    <a class="site-logo" href="#">
+      <span class="site-logo-mark">HS</span>
+      <span>
+        <strong>HSReplay Deck View</strong>
+        <small>Reusable Hearthstone UI patterns</small>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Навигация по витрине">
+      <a href="#tiles">Плитки</a>
+      <a href="#icons">Иконки</a>
+      <a href="#archetypes">Архетипы</a>
+      <a href="#api">API</a>
+      <a class="site-nav-github" href="https://github.com/Zulut30/hsreplay-deck-view">GitHub</a>
+    </nav>
+  </header>
 
-    <section class="demo-section icon-section" aria-labelledby="icons-title">
-      <h2 id="icons-title">Circle icon strip</h2>
-      <article class="deck-row-card">
-        <div class="deck-row-summary">
-          <div class="deck-row-identity">
-            <div class="deck-row-class-icon"></div>
-            <div>
-              <h3>Imbue Rogue</h3>
-              <p>6 520</p>
-            </div>
-          </div>
-          <dl class="deck-row-stats">
-            <div>
-              <dt>Побед</dt>
-              <dd class="deck-row-winrate">49,0%</dd>
-            </div>
-            <div>
-              <dt>Игр</dt>
-              <dd>1 600</dd>
-            </div>
-            <div>
-              <dt>Avg Duration</dt>
-              <dd>9,5 мин</dd>
-            </div>
-          </dl>
-        </div>
-        <div class="deck-row-icons">
-          <div id="sample-icons" class="demo-loading">Loading HearthstoneJSON...</div>
-        </div>
-      </article>
-      <p class="demo-note">
-        Это тот же набор карт, но в режиме круглых иконок: <code>renderIconsFromDbfIds</code>.
-      </p>
-    </section>
-
-    <section class="demo-section square-section" aria-labelledby="squares-title">
-      <h2 id="squares-title">Square icon strip</h2>
-      <article class="square-row-card">
-        <div id="sample-squares" class="demo-loading">Loading HearthstoneJSON...</div>
-      </article>
-      <p class="demo-note">
-        Третий вариант использует квадратные иконки: <code>renderSquareIconsFromDbfIds</code>.
-        У копий справа стоит <code>×2</code>, у одиночных легендарок — <code>★</code>.
-      </p>
-    </section>
-
-    <section class="demo-section archetype-section" aria-labelledby="archetypes-title">
-      <h2 id="archetypes-title">Archetype art card</h2>
-      <article class="archetype-row-card">
-        <div id="sample-archetypes"></div>
-      </article>
-      <p class="demo-note">
-        Четвертый вариант строит строку архетипа из нескольких 256x-артов:
-        <code>renderArchetypes</code>.
-      </p>
-    </section>
-
-    <div class="demo-grid">
-      <section class="demo-section deck-section" aria-labelledby="deck-title">
-        <h2 id="deck-title">Deck list from data-deck-cards</h2>
-        <div id="sample-deck" class="demo-loading">Loading HearthstoneJSON...</div>
-        <p class="demo-note">
-          Этот список строится из строки dbfId, как в HTML HSReplay:
-          <code>data-deck-cards="69521,69521,69623..."</code>.
+  <main class="site-main">
+    <section id="overview" class="site-section overview-section" aria-labelledby="overview-title">
+      <div class="section-kicker">Live component gallery</div>
+      <div class="overview-heading">
+        <h1 id="overview-title">Все варианты карточек для Hearthstone-страниц</h1>
+        <p>
+          Одна маленькая библиотека без сборки: подключил CSS/JS, передал готовые карты или card id,
+          получил HSReplay-похожие плитки, иконки и архетипы.
         </p>
-      </section>
+      </div>
 
-      <section class="demo-section showcase-section" aria-labelledby="showcase-title">
-        <h2 id="showcase-title">Rarities and mana costs</h2>
-        <div class="demo-stack">
-          <div>
-            <h2>All rarities</h2>
-            <div id="rarity-showcase"></div>
+      <div class="component-grid">
+        <article class="component-card component-card--deck">
+          <div class="component-card-head">
+            <span>Deck tiles</span>
+            <strong>mana + rarity + art</strong>
           </div>
+          <div id="hero-deck" class="deck-preview"></div>
+        </article>
+
+        <article class="component-card component-card--icons">
+          <div class="component-card-head">
+            <span>Circle strip</span>
+            <strong>compact deck row</strong>
+          </div>
+          <div id="hero-icons" class="icons-preview"></div>
+        </article>
+
+        <article class="component-card component-card--squares">
+          <div class="component-card-head">
+            <span>Square strip</span>
+            <strong>arena-style icons</strong>
+          </div>
+          <div id="hero-squares" class="squares-preview"></div>
+        </article>
+
+        <article class="component-card component-card--archetype">
+          <div class="component-card-head">
+            <span>Archetype row</span>
+            <strong>layered background arts</strong>
+          </div>
+          <div id="hero-archetype" class="archetype-preview"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="tiles" class="site-section detail-section" aria-labelledby="tiles-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 01</div>
+        <h2 id="tiles-title">Плитки карт</h2>
+        <p>
+          Классический список: стоимость слева, цвет редкости, затемнение под названием,
+          счетчик копий или звезда для одиночной легендарки.
+        </p>
+      </div>
+      <div class="demo-surface demo-surface--deck">
+        <div id="sample-deck"></div>
+      </div>
+    </section>
+
+    <section id="icons" class="site-section detail-section detail-section--wide" aria-labelledby="icons-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 02</div>
+        <h2 id="icons-title">Круглые иконки</h2>
+        <p>
+          Узкая строка для карточки колоды: арты в кружках, `×2` для копий и `★`
+          для легендарок.
+        </p>
+      </div>
+      <div class="deck-row-showcase">
+        <div class="deck-row-profile">
+          <div class="profile-icon" aria-hidden="true"></div>
           <div>
-            <h2>Costs 0-10</h2>
-            <div id="cost-showcase"></div>
+            <h3>Imbue Rogue</h3>
+            <p>6 520 dust</p>
           </div>
         </div>
-      </section>
-    </div>
+        <dl class="deck-row-metrics">
+          <div>
+            <dt>Побед</dt>
+            <dd class="metric-good">49,0%</dd>
+          </div>
+          <div>
+            <dt>Игр</dt>
+            <dd>1 600</dd>
+          </div>
+          <div>
+            <dt>Avg Duration</dt>
+            <dd>9,5 мин</dd>
+          </div>
+        </dl>
+        <div id="sample-icons" class="deck-row-strip"></div>
+      </div>
+    </section>
+
+    <section id="squares" class="site-section detail-section detail-section--wide" aria-labelledby="squares-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 03</div>
+        <h2 id="squares-title">Квадратные иконки</h2>
+        <p>
+          Более плотный вариант для длинных рядов: ровные квадратные превью, мягкий
+          радиус и такие же бейджи количества.
+        </p>
+      </div>
+      <div class="square-ribbon">
+        <div id="sample-squares"></div>
+      </div>
+    </section>
+
+    <section id="archetypes" class="site-section detail-section detail-section--wide" aria-labelledby="archetypes-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 04</div>
+        <h2 id="archetypes-title">Карточки архетипов</h2>
+        <p>
+          Несколько артов берутся как фоновые панели, накладываются через диагональный
+          разделитель и остаются достаточно мягкими, чтобы название читалось сразу.
+        </p>
+      </div>
+      <div class="archetype-board">
+        <div id="sample-archetypes"></div>
+      </div>
+    </section>
+
+    <section id="reference" class="site-section reference-section" aria-labelledby="reference-title">
+      <div class="section-copy">
+        <div class="section-kicker">Reference</div>
+        <h2 id="reference-title">Редкости и стоимость</h2>
+        <p>
+          Быстрая проверка цветов, длинных названий и диапазона маны от 0 до 10.
+        </p>
+      </div>
+      <div class="reference-grid">
+        <div class="demo-surface">
+          <h3>All rarities</h3>
+          <div id="rarity-showcase"></div>
+        </div>
+        <div class="demo-surface">
+          <h3>Costs 0-10</h3>
+          <div id="cost-showcase"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="api" class="site-section api-section" aria-labelledby="api-title">
+      <div class="section-copy">
+        <div class="section-kicker">Drop-in API</div>
+        <h2 id="api-title">Подключение</h2>
+        <p>
+          Сайт на GitHub Pages использует те же публичные методы, что описаны в README.
+        </p>
+      </div>
+      <pre><code>&lt;link rel="stylesheet" href="src/hsreplay-deck-view.css"&gt;
+&lt;script src="src/hsreplay-deck-view.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  HSReplayDeckView.renderDeck("#deck", cards);
+  HSReplayDeckView.renderIcons("#icons", cards);
+  HSReplayDeckView.renderSquareIcons("#squares", cards);
+  HSReplayDeckView.renderArchetypes("#archetypes", archetypes);
+&lt;/script&gt;</code></pre>
+    </section>
   </main>
 
+  <footer class="site-footer">
+    <span>Built for reusable Hearthstone deck UI.</span>
+    <a href="https://github.com/Zulut30/hsreplay-deck-view">Zulut30/hsreplay-deck-view</a>
+  </footer>
+
   <script src="src/hsreplay-deck-view.js"></script>
-  <script>
-    const DECK_DBF_IDS = [
-      69521, 69521, 69623, 69623, 126088, 123060, 123060, 120647, 120647,
-      102227, 102227, 115088, 115088, 117697, 117697, 102745, 123605,
-      123605, 123549, 123549, 117762, 119532, 125450, 122832, 124150,
-      114849, 115090, 123072, 123072, 125467
-    ];
-
-    const RARITY_CARDS = [
-      { id: "Core_CS2_008", name: "Лунный огонь", cost: 0, rarity: "FREE", count: 1 },
-      { id: "AT_006", name: "Боец из Даларана", cost: 4, rarity: "COMMON", count: 2 },
-      { id: "AT_003", name: "Павший герой", cost: 2, rarity: "RARE", count: 2 },
-      { id: "AT_061", name: "На изготовку!", cost: 0, rarity: "EPIC", count: 2 },
-      { id: "AT_072", name: "Вариан Ринн", cost: 10, rarity: "LEGENDARY", elite: true, count: 1 }
-    ];
-
-    const COST_CARDS = [
-      { id: "AT_061", name: "На изготовку!", cost: 0, rarity: "EPIC", count: 2 },
-      { id: "AT_004", name: "Чародейская вспышка", cost: 1, rarity: "EPIC", count: 2 },
-      { id: "AT_003", name: "Павший герой", cost: 2, rarity: "RARE", count: 2 },
-      { id: "AT_002", name: "Чучело", cost: 3, rarity: "RARE", count: 2 },
-      { id: "AT_006", name: "Боец из Даларана", cost: 4, rarity: "COMMON", count: 2 },
-      { id: "AT_001", name: "Огненное копье", cost: 5, rarity: "COMMON", count: 2 },
-      { id: "AT_008", name: "Дракон Хладарры", cost: 6, rarity: "EPIC", count: 2 },
-      { id: "AT_018", name: "Исповедница Пейлтресс", cost: 7, rarity: "LEGENDARY", elite: true, count: 1 },
-      { id: "AT_009", name: "Ронин", cost: 8, rarity: "LEGENDARY", elite: true, count: 1 },
-      { id: "AT_045", name: "Авиана", cost: 9, rarity: "LEGENDARY", elite: true, count: 1 },
-      { id: "AT_072", name: "Вариан Ринн", cost: 10, rarity: "LEGENDARY", elite: true, count: 1 }
-    ];
-
-    const ARCHETYPE_CARDS = [
-      {
-        name: "Манипулятор маг",
-        icon: "CS2_029",
-        arts: [
-          { id: "EDR_451", position: "center center" },
-          { id: "EDR_852", position: "center center" },
-          { id: "EDR_264", position: "center center" }
-        ]
-      }
-    ];
-
-    function showError(target, error) {
-      const element = document.querySelector(target);
-      element.className = "demo-error";
-      element.textContent = error.message;
-    }
-
-    const sampleDeckElement = document.querySelector("#sample-deck");
-    const sampleIconsElement = document.querySelector("#sample-icons");
-    const sampleSquaresElement = document.querySelector("#sample-squares");
-
-    HSReplayDeckView.cardsFromDbfIds(DECK_DBF_IDS, {
-      locale: "ruRU"
-    })
-      .then((cards) => {
-        HSReplayDeckView.renderDeck("#sample-deck", cards);
-        HSReplayDeckView.renderIcons("#sample-icons", cards, {
-          className: "sample-icons-strip"
-        });
-        HSReplayDeckView.renderSquareIcons("#sample-squares", cards, {
-          className: "sample-square-strip"
-        });
-        sampleDeckElement.className = "";
-        sampleIconsElement.className = "";
-        sampleSquaresElement.className = "";
-      })
-      .catch((error) => {
-        showError("#sample-deck", error);
-        showError("#sample-icons", error);
-        showError("#sample-squares", error);
-      });
-
-    HSReplayDeckView.renderDeck("#rarity-showcase", RARITY_CARDS, {
-      group: false,
-      sort: false
-    });
-
-    HSReplayDeckView.renderDeck("#cost-showcase", COST_CARDS, {
-      group: false,
-      sort: false
-    });
-
-    HSReplayDeckView.renderArchetypes("#sample-archetypes", ARCHETYPE_CARDS);
-  </script>
+  <script src="src/showcase.js"></script>
 </body>
 </html>

@@ -4,6 +4,12 @@
 
 Проект не требует сборки и фреймворков. Достаточно подключить CSS и JS.
 
+## Живая витрина
+
+GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
+
+![Showcase site](assets/screenshots/site-showcase.png)
+
 ## Скриншоты
 
 ### Колода из `data-deck-cards`
@@ -379,6 +385,16 @@ npm run screenshots
 
 ```bash
 CHROMIUM_BIN=/path/to/chromium npm run screenshots
+```
+
+## GitHub Pages
+
+В репозитории есть workflow `.github/workflows/pages.yml`. Он публикует статический сайт из корня `main`: `index.html`, `src/`, `assets/` и `.nojekyll`.
+
+Локально сайт можно открыть через:
+
+```bash
+npm run serve
 ```
 
 ## Источники данных

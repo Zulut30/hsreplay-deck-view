@@ -50,6 +50,7 @@ function capture(chromium, name, view, windowSize) {
 
 mkdirSync(screenshotDir, { recursive: true });
 const chromium = findChromium();
+capture(chromium, "site-showcase.png", "all", "1440,1700");
 capture(chromium, "icon-strip-demo.png", "icons", "1320,260");
 capture(chromium, "square-strip-demo.png", "squares", "1564,230");
 capture(chromium, "archetype-card-demo.png", "archetypes", "840,150");
