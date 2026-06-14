@@ -407,8 +407,8 @@ p {
   overflow: hidden;
   padding: 22px 26px;
   background:
-    linear-gradient(90deg, rgb(45 31 68 / 78%), rgb(78 43 88 / 66%)),
-    url("https://art.hearthstonejson.com/v1/256x/BGS_018.webp") 32% 35% / 360px auto no-repeat;
+    linear-gradient(90deg, rgb(45 31 68 / 82%), rgb(78 43 88 / 70%)),
+    url("https://art.hearthstonejson.com/v1/256x/BGS_018.webp") center 36% / cover no-repeat;
   color: #fff;
 }
 
