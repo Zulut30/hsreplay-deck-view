@@ -1,6 +1,6 @@
 # HSReplay Deck View
 
-Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых/квадратных иконок, строка архетипа с несколькими артами на фоне через диагональные разделители и большой каменный Battlegrounds-портрет.
+Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых/квадратных иконок, строка архетипа с несколькими артами на фоне через диагональные разделители, большой каменный Battlegrounds-портрет и карточка синергии для комбо/BG-связок.
 
 Проект не требует сборки и фреймворков. Достаточно подключить CSS и JS.
 
@@ -31,6 +31,10 @@ GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
 ### Каменный портрет
 
 ![Stone portrait demo](assets/screenshots/stone-portrait-demo.png)
+
+### Карточка синергии
+
+![Synergy card demo](assets/screenshots/synergy-card-demo.png)
 
 ### Все редкости и стоимости 0-10
 
@@ -188,6 +192,146 @@ HSReplayDeckView.renderStonePortraits("#stone-portrait", portraits, {
 });
 ```
 
+## Карточки синергий
+
+Карточка синергии нужна для короткого объяснения связки: какие карты/миньоны нужны, в каком порядке они работают и какой результат дают. Это удобно для:
+
+- комбо в гайдах;
+- стартовых keep/mulligan-планов;
+- Battlegrounds-связок;
+- объяснения “ядра” архетипа;
+- карточек советов внутри статей или дашбордов.
+
+Компонент поддерживает два типа разделителей:
+
+- `connector: "plus"` рисует `+` между элементами, когда карты работают вместе;
+- `connector: "arrow"` рисует `→`, когда важен порядок действий.
+
+```html
+<link rel="stylesheet" href="src/hsreplay-deck-view.css">
+<div id="synergies"></div>
+<script src="src/hsreplay-deck-view.js"></script>
+<script>
+  HSReplayDeckView.renderSynergies("#synergies", [
+    {
+      title: "Tempo setup",
+      subtitle: "Дешевая подготовка, генератор ресурса и payoff в один сильный ход.",
+      eyebrow: "Combo",
+      badge: "+ chain",
+      connector: "plus",
+      items: [
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", label: "discount", count: 2 },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", label: "resource", count: 2 },
+        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", label: "payoff", count: 2 }
+      ],
+      result: {
+        label: "Итог",
+        value: "ранний темп и полный refill руки"
+      }
+    }
+  ]);
+</script>
+```
+
+Пример с порядком действий:
+
+```js
+HSReplayDeckView.renderSynergies("#synergies", [
+  {
+    title: "Battlegrounds scaling line",
+    connector: "arrow",
+    items: [
+      { id: "BGS_018", name: "Голдринн", rarity: "LEGENDARY", elite: true, label: "core" },
+      { id: "TLC_835", name: "Триггер", label: "trigger", count: 2 },
+      { id: "CATA_190h", name: "Финишер", rarity: "LEGENDARY", elite: true, label: "board" }
+    ],
+    result: "Понятный порядок действий для гайда или разбора"
+  }
+]);
+```
+
+### Структура объекта синергии
+
+| Поле | Тип | Что делает |
+|---|---|---|
+| `title` / `name` | string | Главный заголовок карточки |
+| `subtitle` / `description` / `text` | string | Короткое объяснение под заголовком |
+| `eyebrow` / `type` / `category` | string | Маленькая подпись над заголовком: `Combo`, `BG link`, `Mulligan` |
+| `badge` / `tag` | string | Бейдж справа в шапке |
+| `connector` | `plus` или `arrow` | Разделитель между элементами: `+` или `→` |
+| `items` / `cards` / `minions` / `sequence` | array | Карты/миньоны в цепочке |
+| `result` / `outcome` / `payoff` | string или object | Нижний блок результата |
+| `url` / `href` | string | Если задан, вся карточка становится ссылкой |
+| `label` / `ariaLabel` | string | Доступное имя карточки для скринридеров |
+
+`result` можно передать строкой:
+
+```js
+result: "Большой темповый swing"
+```
+
+или объектом:
+
+```js
+result: {
+  label: "Итог",
+  value: "ранний темп и полный refill руки"
+}
+```
+
+### Структура элемента цепочки
+
+| Поле | Тип | Что делает |
+|---|---|---|
+| `id` / `cardId` | string | Hearthstone card id для картинки |
+| `name` / `title` | string | Название под иконкой |
+| `label` / `caption` / `role` / `note` | string | Маленькая роль: `discount`, `resource`, `payoff` |
+| `rarity` | string | Нужна для внутренней совместимости и будущих цветовых расширений |
+| `count` | number | Если больше 1, показывает маленький `×2` бейдж |
+| `elite` | boolean | Для одиночной легендарки показывает маленькую `★` |
+| `image` / `imageUrl` / `art` / `src` | string | Прямой URL картинки вместо HearthstoneJSON |
+| `href` / `url` | string | Если задан, конкретный элемент становится ссылкой |
+| `dbfId` | number | Пишется в `data-dbf-id`, если нужен трекинг |
+| `predicted` | boolean | Делает элемент полупрозрачным и серым |
+
+Можно передать не объект, а просто строку:
+
+```js
+items: ["CORE_EX1_145", "EDR_852", "TIME_045"]
+```
+
+Тогда строка трактуется как card id. Если строка выглядит как URL, она используется как прямой image URL.
+
+### CSS-переменные синергий
+
+```css
+#synergies .hsrdv {
+  --hsrdv-synergy-card-width: 760px;
+  --hsrdv-synergy-item-size: 68px;
+  --hsrdv-synergy-item-gap: 12px;
+  --hsrdv-synergy-connector-size: 34px;
+}
+```
+
+Что менять чаще всего:
+
+| Переменная | Для чего |
+|---|---|
+| `--hsrdv-synergy-card-width` | Максимальная ширина карточки |
+| `--hsrdv-synergy-item-size` | Размер квадратного арта карты/миньона |
+| `--hsrdv-synergy-item-gap` | Расстояние между картой и разделителем |
+| `--hsrdv-synergy-connector-size` | Ширина зоны под `+` или `→` |
+
+Если нужен очень компактный вариант для сайдбара:
+
+```css
+.sidebar-synergy .hsrdv {
+  --hsrdv-synergy-item-size: 52px;
+  --hsrdv-synergy-item-gap: 8px;
+  --hsrdv-synergy-connector-size: 22px;
+}
+```
+
 ## Готовые объекты карт
 
 Если на сайте уже есть данные карт, можно не грузить HearthstoneJSON:
@@ -286,6 +430,12 @@ HSReplayDeckView.renderStonePortraitsFromDbfIds(target, dbfIds, options)
 Рендерит каменные портреты из массива dbfId или строки. Для Battlegrounds-карт чаще удобнее передавать готовые `id`, потому что стандартный `dataUrl` указывает на collectible JSON.
 
 ```js
+HSReplayDeckView.renderSynergies(target, synergies, options)
+```
+
+Рендерит список карточек синергий. Принимает массив объектов синергий; внутри каждой синергии `items` могут быть объектами, card id или прямыми URL.
+
+```js
 HSReplayDeckView.cardsFromDbfIds(dbfIds, options)
 ```
 
@@ -321,6 +471,18 @@ HSReplayDeckView.createStonePortrait(portrait, options)
 
 Возвращает DOM-элемент одного каменного портрета.
 
+```js
+HSReplayDeckView.createSynergyCard(synergy, options)
+```
+
+Возвращает DOM-элемент одной карточки синергии.
+
+```js
+HSReplayDeckView.createSynergyItem(item, options)
+```
+
+Возвращает DOM-элемент одного элемента цепочки внутри карточки синергии.
+
 Основные опции:
 
 | Опция | По умолчанию | Назначение |
@@ -341,6 +503,8 @@ HSReplayDeckView.createStonePortrait(portrait, options)
 | `stonePortraitArtBaseUrl` | HearthstoneJSON 256x CDN | База URL для арта каменного портрета |
 | `stonePortraitArtFormat` | `webp` | Формат арта каменного портрета |
 | `stonePortraitFrameImage` | HSReplay minion frame | URL каменной рамки |
+| `synergyArtBaseUrl` | HearthstoneJSON tiles CDN | База URL для картинок элементов синергии |
+| `synergyArtFormat` | `webp` | Формат картинок элементов синергии |
 
 ## HTML-паттерн одной плитки
 
@@ -445,6 +609,64 @@ JS генерирует такую структуру:
 
 Каменная рамка живет в `.hsrdv-stone-portrait::before`, поэтому DOM остается легким: контейнер + один `img`.
 
+## HTML-паттерн карточки синергии
+
+```html
+<ul class="hsrdv-synergy-list">
+  <li>
+    <article class="hsrdv-synergy-card hsrdv-synergy-card--plus" aria-label="Tempo setup">
+      <header class="hsrdv-synergy-header">
+        <div class="hsrdv-synergy-title-group">
+          <span class="hsrdv-synergy-eyebrow">Combo</span>
+          <h3 class="hsrdv-synergy-title">Tempo setup</h3>
+          <p class="hsrdv-synergy-subtitle">Дешевая подготовка, генератор ресурса и payoff.</p>
+        </div>
+        <span class="hsrdv-synergy-card-badge">+ chain</span>
+      </header>
+
+      <ol class="hsrdv-synergy-chain">
+        <li class="hsrdv-synergy-chain-item">
+          <div class="hsrdv-synergy-item hsrdv-rarity-epic" aria-label="Подготовка, discount">
+            <span class="hsrdv-synergy-artbox">
+              <span
+                class="hsrdv-synergy-art"
+                style="background-image: url(&quot;https://art.hearthstonejson.com/v1/tiles/CORE_EX1_145.webp&quot;)"
+              ></span>
+              <span class="hsrdv-synergy-badge hsrdv-synergy-badge--copies">×2</span>
+            </span>
+            <span class="hsrdv-synergy-name">Подготовка</span>
+            <span class="hsrdv-synergy-label">discount</span>
+          </div>
+        </li>
+
+        <li class="hsrdv-synergy-connector" aria-hidden="true"><span>+</span></li>
+
+        <li class="hsrdv-synergy-chain-item">
+          <div class="hsrdv-synergy-item hsrdv-rarity-rare" aria-label="Агент Древних, resource">
+            <span class="hsrdv-synergy-artbox">
+              <span
+                class="hsrdv-synergy-art"
+                style="background-image: url(&quot;https://art.hearthstonejson.com/v1/tiles/EDR_852.webp&quot;)"
+              ></span>
+              <span class="hsrdv-synergy-badge hsrdv-synergy-badge--copies">×2</span>
+            </span>
+            <span class="hsrdv-synergy-name">Агент Древних</span>
+            <span class="hsrdv-synergy-label">resource</span>
+          </div>
+        </li>
+      </ol>
+
+      <div class="hsrdv-synergy-result">
+        <span class="hsrdv-synergy-result-label">Итог</span>
+        <strong>ранний темп и полный refill руки</strong>
+      </div>
+    </article>
+  </li>
+</ul>
+```
+
+Классы цепочки намеренно отдельные от обычных квадратных иконок. Так можно независимо менять размер синергии, не ломая `renderSquareIcons`.
+
 ## Демо и скриншоты
 
 Открыть локально:
@@ -492,4 +714,4 @@ npm run serve
 - Full art для архетипов и каменных портретов: `https://art.hearthstonejson.com/v1/256x/{cardId}.webp`
 - Каменная рамка: `https://static.hsreplay.net/static/webpack/assets/images/battlegrounds/minion-frame.d21732172d83faeae997.png`
 
-Для сайтов, где нельзя зависеть от внешних CDN, передавайте свои поля `image` и готовые данные карт в `renderDeck`, для архетипов используйте прямые URL в `icon` и `arts`, а для каменных портретов подменяйте `stonePortraitFrameImage`.
+Для сайтов, где нельзя зависеть от внешних CDN, передавайте свои поля `image` и готовые данные карт в `renderDeck`, для архетипов используйте прямые URL в `icon` и `arts`, для каменных портретов подменяйте `stonePortraitFrameImage`, а для синергий передавайте прямые URL в `items[].image`.

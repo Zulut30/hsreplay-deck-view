@@ -6,7 +6,7 @@
   <title>HSReplay Deck View Components</title>
   <meta
     name="description"
-    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, карточки архетипов и каменные портреты Battlegrounds."
+    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, карточки архетипов, каменные портреты Battlegrounds и карточки синергий."
   >
   <script>
     document.documentElement.dataset.view = new URLSearchParams(location.search).get("view") || "all";
@@ -33,6 +33,7 @@
       <a href="#icons">Иконки</a>
       <a href="#archetypes">Архетипы</a>
       <a href="#stone">Камни</a>
+      <a href="#synergies">Синергии</a>
       <a href="#api">API</a>
       <a class="site-nav-github" href="https://github.com/Zulut30/hsreplay-deck-view">GitHub</a>
     </nav>
@@ -88,6 +89,14 @@
             <strong>battlegrounds frame</strong>
           </div>
           <div id="hero-stone" class="stone-preview"></div>
+        </article>
+
+        <article class="component-card component-card--synergy">
+          <div class="component-card-head">
+            <span>Synergy card</span>
+            <strong>combo chain</strong>
+          </div>
+          <div id="hero-synergy" class="synergy-preview"></div>
         </article>
       </div>
     </section>
@@ -166,6 +175,20 @@
       </div>
     </section>
 
+    <section id="synergies" class="site-section detail-section detail-section--wide" aria-labelledby="synergies-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 06</div>
+        <h2 id="synergies-title">Карточка синергии</h2>
+        <p>
+          Несколько карт или миньонов в цепочке с `+` или стрелкой: удобно показывать
+          комбо, муллиган-план, BG-связки и итоговый payoff.
+        </p>
+      </div>
+      <div class="synergy-board">
+        <div id="sample-synergies"></div>
+      </div>
+    </section>
+
     <section id="reference" class="site-section reference-section" aria-labelledby="reference-title">
       <div class="section-copy">
         <div class="section-kicker">Reference</div>
@@ -202,6 +225,7 @@
   HSReplayDeckView.renderSquareIcons("#squares", cards);
   HSReplayDeckView.renderArchetypes("#archetypes", archetypes);
   HSReplayDeckView.renderStonePortraits("#stone", portraits);
+  HSReplayDeckView.renderSynergies("#synergies", synergies);
 &lt;/script&gt;</code></pre>
     </section>
   </main>

@@ -211,7 +211,7 @@ p {
 }
 
 .component-card--deck {
-  grid-row: span 4;
+  grid-row: span 5;
 }
 
 .component-card-head {
@@ -250,7 +250,8 @@ p {
 .icons-preview,
 .squares-preview,
 .archetype-preview,
-.stone-preview {
+.stone-preview,
+.synergy-preview {
   min-width: 0;
 }
 
@@ -258,10 +259,12 @@ p {
 .squares-preview .hsrdv,
 .archetype-preview .hsrdv,
 .stone-preview .hsrdv,
+.synergy-preview .hsrdv,
 .deck-row-strip .hsrdv,
 .square-ribbon .hsrdv,
 .archetype-board .hsrdv,
-.stone-comp-showcase .hsrdv {
+.stone-comp-showcase .hsrdv,
+.synergy-board .hsrdv {
   max-width: none;
 }
 
@@ -302,6 +305,28 @@ p {
   --hsrdv-stone-portrait-gap: 12px;
 }
 
+.synergy-preview .hsrdv {
+  --hsrdv-synergy-item-size: 46px;
+  --hsrdv-synergy-item-gap: 7px;
+  --hsrdv-synergy-connector-size: 20px;
+}
+
+.synergy-preview .hsrdv-synergy-card {
+  gap: 10px;
+  padding: 12px;
+  box-shadow: none;
+}
+
+.synergy-preview .hsrdv-synergy-subtitle,
+.synergy-preview .hsrdv-synergy-result,
+.synergy-preview .hsrdv-synergy-label {
+  display: none;
+}
+
+.synergy-preview .hsrdv-synergy-chain {
+  padding-bottom: 2px;
+}
+
 .detail-section,
 .reference-section,
 .api-section {
@@ -326,6 +351,7 @@ p {
 .square-ribbon,
 .archetype-board,
 .stone-comp-showcase,
+.synergy-board,
 .api-section pre {
   min-width: 0;
   border: 1px solid var(--site-line);
@@ -440,6 +466,19 @@ p {
   color: rgb(255 255 255 / 76%);
   font-size: 1rem;
   font-weight: 700;
+}
+
+.synergy-board {
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgb(248 250 252), rgb(232 237 243));
+}
+
+.synergy-board .hsrdv {
+  --hsrdv-synergy-card-width: 100%;
+  --hsrdv-synergy-item-size: 72px;
+  --hsrdv-synergy-item-gap: 14px;
+  --hsrdv-synergy-connector-size: 38px;
 }
 
 .reference-grid {
@@ -560,6 +599,16 @@ p {
   .stone-comp-copy h3 {
     font-size: 1.45rem;
   }
+
+  .synergy-board {
+    padding: 12px;
+  }
+
+  .synergy-board .hsrdv {
+    --hsrdv-synergy-item-size: 58px;
+    --hsrdv-synergy-item-gap: 9px;
+    --hsrdv-synergy-connector-size: 24px;
+  }
 }
 
 html[data-view="deck"] .site-top,
@@ -567,12 +616,14 @@ html[data-view="icons"] .site-top,
 html[data-view="squares"] .site-top,
 html[data-view="archetypes"] .site-top,
 html[data-view="stone"] .site-top,
+html[data-view="synergies"] .site-top,
 html[data-view="showcase"] .site-top,
 html[data-view="deck"] .site-footer,
 html[data-view="icons"] .site-footer,
 html[data-view="squares"] .site-footer,
 html[data-view="archetypes"] .site-footer,
 html[data-view="stone"] .site-footer,
+html[data-view="synergies"] .site-footer,
 html[data-view="showcase"] .site-footer {
   display: none;
 }
@@ -582,6 +633,7 @@ html[data-view="icons"] .site-main,
 html[data-view="squares"] .site-main,
 html[data-view="archetypes"] .site-main,
 html[data-view="stone"] .site-main,
+html[data-view="synergies"] .site-main,
 html[data-view="showcase"] .site-main {
   width: min(100vw - 16px, 1180px);
   padding: 4px 0 0;
@@ -592,6 +644,7 @@ html[data-view="icons"] .site-section,
 html[data-view="squares"] .site-section,
 html[data-view="archetypes"] .site-section,
 html[data-view="stone"] .site-section,
+html[data-view="synergies"] .site-section,
 html[data-view="showcase"] .site-section {
   margin-top: 0;
 }
@@ -601,6 +654,7 @@ html[data-view="icons"] .site-section:not(#icons),
 html[data-view="squares"] .site-section:not(#squares),
 html[data-view="archetypes"] .site-section:not(#archetypes),
 html[data-view="stone"] .site-section:not(#stone),
+html[data-view="synergies"] .site-section:not(#synergies),
 html[data-view="showcase"] .site-section:not(#reference) {
   display: none;
 }
@@ -610,6 +664,7 @@ html[data-view="icons"] .section-copy,
 html[data-view="squares"] .section-copy,
 html[data-view="archetypes"] .section-copy,
 html[data-view="stone"] .section-copy,
+html[data-view="synergies"] .section-copy,
 html[data-view="showcase"] .section-copy {
   display: none;
 }
@@ -619,6 +674,7 @@ html[data-view="icons"] .detail-section,
 html[data-view="squares"] .detail-section,
 html[data-view="archetypes"] .detail-section,
 html[data-view="stone"] .detail-section,
+html[data-view="synergies"] .detail-section,
 html[data-view="showcase"] .reference-section {
   display: block;
   padding-top: 0;
@@ -632,6 +688,7 @@ html[data-view="icons"] .deck-row-showcase,
 html[data-view="squares"] .square-ribbon,
 html[data-view="archetypes"] .archetype-board,
 html[data-view="stone"] .stone-comp-showcase,
+html[data-view="synergies"] .synergy-board,
 html[data-view="showcase"] .reference-grid {
   box-shadow: none;
 }

@@ -93,6 +93,38 @@
     }
   ];
 
+  const SYNERGIES = [
+    {
+      title: "Tempo setup",
+      subtitle: "Дешевая подготовка, генератор ресурса и payoff в один сильный ход.",
+      eyebrow: "Combo",
+      badge: "+ chain",
+      connector: "plus",
+      items: [
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", label: "discount", count: 2 },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", label: "resource", count: 2 },
+        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", label: "payoff", count: 2 }
+      ],
+      result: {
+        label: "Итог",
+        value: "ранний темп и полный refill руки"
+      }
+    },
+    {
+      title: "Battlegrounds scaling line",
+      subtitle: "Показывает порядок: ключевой зверь, бафф и финальный большой стол.",
+      eyebrow: "BG link",
+      badge: "arrow",
+      connector: "arrow",
+      items: [
+        { id: "BGS_018", name: "Голдринн", rarity: "LEGENDARY", elite: true, label: "core" },
+        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", label: "trigger", count: 2 },
+        { id: "CATA_190h", name: "Финишер", rarity: "LEGENDARY", elite: true, label: "board" }
+      ],
+      result: "Понятный порядок действий для гайда или разбора"
+    }
+  ];
+
   function render() {
     const api = window.HSReplayDeckView;
     if (!api) {
@@ -117,6 +149,7 @@
       arts: archetype.arts
     })));
     api.renderStonePortraits("#hero-stone", STONE_PORTRAITS);
+    api.renderSynergies("#hero-synergy", SYNERGIES.slice(0, 1));
 
     api.renderDeck("#sample-deck", DECK_CARDS, {
       group: false,
@@ -132,6 +165,7 @@
     });
     api.renderArchetypes("#sample-archetypes", ARCHETYPES);
     api.renderStonePortraits("#sample-stone", STONE_PORTRAITS);
+    api.renderSynergies("#sample-synergies", SYNERGIES);
 
     api.renderDeck("#rarity-showcase", RARITY_CARDS, {
       group: false,

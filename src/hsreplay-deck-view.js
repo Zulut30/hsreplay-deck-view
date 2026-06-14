@@ -26,7 +26,9 @@
     archetypeIconFormat: "webp",
     stonePortraitArtBaseUrl: "https://art.hearthstonejson.com/v1/256x/",
     stonePortraitArtFormat: "webp",
-    stonePortraitFrameImage: "https://static.hsreplay.net/static/webpack/assets/images/battlegrounds/minion-frame.d21732172d83faeae997.png"
+    stonePortraitFrameImage: "https://static.hsreplay.net/static/webpack/assets/images/battlegrounds/minion-frame.d21732172d83faeae997.png",
+    synergyArtBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
+    synergyArtFormat: "webp"
   };
 
   const RARITY_ORDER = {
@@ -187,6 +189,16 @@
     return `${options.stonePortraitArtBaseUrl}${portrait.id}.${options.stonePortraitArtFormat}`;
   }
 
+  function getSynergyArtUrl(item, options) {
+    if (item.image) {
+      return item.image;
+    }
+    if (!item.id) {
+      return "";
+    }
+    return `${options.synergyArtBaseUrl}${item.id}.${options.synergyArtFormat}`;
+  }
+
   function createElement(tagName, className, text) {
     const element = document.createElement(tagName);
     if (className) {
@@ -228,6 +240,16 @@
   }
 
   function parseArchetypeArtworks(input) {
+    if (Array.isArray(input)) {
+      return input;
+    }
+    if (typeof input !== "string") {
+      return [];
+    }
+    return input.split(/[,\s]+/).map((value) => value.trim()).filter(Boolean);
+  }
+
+  function parseSynergyItems(input) {
     if (Array.isArray(input)) {
       return input;
     }
@@ -285,6 +307,88 @@
       href: raw.href || "",
       position: raw.position || raw.objectPosition || raw.imagePosition || "",
       predicted: Boolean(raw.predicted)
+    };
+  }
+
+  function normalizeSynergyItem(item) {
+    if (typeof item === "number") {
+      return normalizeSynergyItem(String(item));
+    }
+    if (typeof item === "string") {
+      const value = item.trim();
+      const isImage = isDirectImageUrl(value);
+      return {
+        id: isImage ? "" : value,
+        dbfId: null,
+        name: value || "Unknown card",
+        label: "",
+        image: isImage ? value : "",
+        href: "",
+        rarity: "common",
+        count: 1,
+        elite: false,
+        predicted: false
+      };
+    }
+
+    const raw = item || {};
+    const rarity = normalizeRarity(raw.rarity);
+    return {
+      id: String(raw.id || raw.cardId || raw.card_id || "").trim(),
+      dbfId: raw.dbfId || raw.dbf_id || null,
+      name: raw.name || raw.title || raw.cardName || raw.id || "Unknown card",
+      label: raw.label || raw.caption || raw.role || raw.note || "",
+      image: raw.image || raw.imageUrl || raw.art || raw.src || "",
+      href: raw.href || raw.url || "",
+      rarity,
+      count: Math.max(1, Number(raw.count || 1)),
+      elite: Boolean(raw.elite) || rarity === "legendary",
+      predicted: Boolean(raw.predicted)
+    };
+  }
+
+  function normalizeSynergy(synergy) {
+    if (Array.isArray(synergy)) {
+      return {
+        title: "Synergy",
+        subtitle: "",
+        eyebrow: "",
+        badge: "",
+        connector: "plus",
+        items: synergy.map(normalizeSynergyItem),
+        result: null,
+        url: "",
+        label: ""
+      };
+    }
+
+    if (typeof synergy === "string") {
+      return {
+        title: synergy,
+        subtitle: "",
+        eyebrow: "",
+        badge: "",
+        connector: "plus",
+        items: [],
+        result: null,
+        url: "",
+        label: synergy
+      };
+    }
+
+    const raw = synergy || {};
+    const connector = String(raw.connector || raw.operator || raw.joiner || "plus").toLowerCase();
+    const result = raw.result || raw.outcome || raw.payoff || null;
+    return {
+      title: raw.title || raw.name || "Synergy",
+      subtitle: raw.subtitle || raw.description || raw.text || "",
+      eyebrow: raw.eyebrow || raw.type || raw.category || "",
+      badge: raw.badge || raw.tag || "",
+      connector: connector === "arrow" || connector === "then" || connector === "to" ? "arrow" : "plus",
+      items: parseSynergyItems(raw.items || raw.cards || raw.minions || raw.cardIds || raw.sequence).map(normalizeSynergyItem),
+      result,
+      url: raw.url || raw.href || "",
+      label: raw.label || raw.ariaLabel || raw.title || raw.name || "Synergy"
     };
   }
 
@@ -512,6 +616,104 @@
     return element;
   }
 
+  function createSynergyItem(rawItem, options) {
+    const settings = withDefaults(options);
+    const item = normalizeSynergyItem(rawItem);
+    const badgeLabel = getIconBadgeLabel(item, settings);
+    const element = createElement(
+      item.href ? "a" : "div",
+      `hsrdv-synergy-item hsrdv-rarity-${item.rarity}${item.predicted ? " hsrdv-synergy-item--predicted" : ""}`
+    );
+    element.setAttribute("aria-label", item.label ? `${item.name}, ${item.label}` : item.name);
+    if (item.href) {
+      element.href = item.href;
+    }
+    if (item.dbfId) {
+      element.dataset.dbfId = String(item.dbfId);
+    }
+    if (item.id) {
+      element.dataset.cardId = item.id;
+    }
+
+    const artBox = createElement("span", "hsrdv-synergy-artbox");
+    const artUrl = getSynergyArtUrl(item, settings);
+    if (artUrl) {
+      const art = createElement("span", "hsrdv-synergy-art");
+      art.style.backgroundImage = `url("${artUrl}")`;
+      artBox.appendChild(art);
+    }
+    if (badgeLabel) {
+      const badgeClass = badgeLabel === "★"
+        ? "hsrdv-synergy-badge hsrdv-synergy-badge--star"
+        : "hsrdv-synergy-badge hsrdv-synergy-badge--copies";
+      artBox.appendChild(createElement("span", badgeClass, badgeLabel));
+    }
+
+    element.appendChild(artBox);
+    element.appendChild(createElement("span", "hsrdv-synergy-name", item.name));
+    if (item.label) {
+      element.appendChild(createElement("span", "hsrdv-synergy-label", item.label));
+    }
+    return element;
+  }
+
+  function createSynergyCard(rawSynergy, options) {
+    const settings = withDefaults(options);
+    const synergy = normalizeSynergy(rawSynergy);
+    const element = createElement(
+      synergy.url ? "a" : "article",
+      `hsrdv-synergy-card hsrdv-synergy-card--${synergy.connector}`
+    );
+    element.setAttribute("aria-label", synergy.label || synergy.title);
+    if (synergy.url) {
+      element.href = synergy.url;
+    }
+
+    const header = createElement("header", "hsrdv-synergy-header");
+    const titleGroup = createElement("div", "hsrdv-synergy-title-group");
+    if (synergy.eyebrow) {
+      titleGroup.appendChild(createElement("span", "hsrdv-synergy-eyebrow", synergy.eyebrow));
+    }
+    titleGroup.appendChild(createElement("h3", "hsrdv-synergy-title", synergy.title));
+    if (synergy.subtitle) {
+      titleGroup.appendChild(createElement("p", "hsrdv-synergy-subtitle", synergy.subtitle));
+    }
+    header.appendChild(titleGroup);
+    if (synergy.badge) {
+      header.appendChild(createElement("span", "hsrdv-synergy-card-badge", synergy.badge));
+    }
+    element.appendChild(header);
+
+    const chain = createElement("ol", "hsrdv-synergy-chain");
+    synergy.items.forEach((item, index) => {
+      if (index > 0) {
+        const connector = createElement("li", "hsrdv-synergy-connector");
+        connector.setAttribute("aria-hidden", "true");
+        connector.appendChild(createElement("span", "", synergy.connector === "arrow" ? "→" : "+"));
+        chain.appendChild(connector);
+      }
+      const chainItem = createElement("li", "hsrdv-synergy-chain-item");
+      chainItem.appendChild(createSynergyItem(item, settings));
+      chain.appendChild(chainItem);
+    });
+    element.appendChild(chain);
+
+    if (synergy.result) {
+      const result = createElement("div", "hsrdv-synergy-result");
+      if (typeof synergy.result === "string") {
+        result.appendChild(createElement("strong", "", synergy.result));
+      } else {
+        if (synergy.result.label) {
+          result.appendChild(createElement("span", "hsrdv-synergy-result-label", synergy.result.label));
+        }
+        result.appendChild(createElement("strong", "", synergy.result.value || synergy.result.text || ""));
+      }
+      element.appendChild(result);
+    }
+
+    return element;
+  }
+
   function renderDeck(target, cards, options) {
     const settings = withDefaults(options);
     const container = resolveTarget(target);
@@ -627,6 +829,27 @@
     return rootElement;
   }
 
+  function renderSynergies(target, synergies, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const rootElement = createElement("div", `hsrdv hsrdv-synergies ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-synergy-list");
+
+    (synergies || []).forEach((synergy) => {
+      const item = createElement("li");
+      item.appendChild(createSynergyCard(synergy, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
   async function loadCardDatabase(options) {
     const settings = withDefaults(options);
     const url = settings.dataUrl.replace("{locale}", settings.locale);
@@ -679,12 +902,16 @@
     createIcon,
     createSquareIcon,
     createStonePortrait,
+    createSynergyCard,
+    createSynergyItem,
     createTile,
     cardsFromDbfIds,
     groupCards,
     loadCardDatabase,
     normalizeCard,
     normalizeStonePortrait,
+    normalizeSynergy,
+    normalizeSynergyItem,
     parseDeckCards,
     renderDeck,
     renderDeckFromDbfIds,
@@ -695,6 +922,7 @@
     renderSquareIconsFromDbfIds,
     renderStonePortraits,
     renderStonePortraitsFromDbfIds,
+    renderSynergies,
     sortCards
   };
 });
