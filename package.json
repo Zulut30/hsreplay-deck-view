@@ -1,0 +1,11 @@
+{
+  "name": "hsreplay-deck-view",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reusable Hearthstone deck tile pattern inspired by HSReplay.",
+  "type": "module",
+  "scripts": {
+    "serve": "python3 -m http.server 8080",
+    "screenshots": "node scripts/capture-screenshots.mjs"
+  }
+}

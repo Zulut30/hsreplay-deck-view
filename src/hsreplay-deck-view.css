@@ -1,0 +1,229 @@
+.hsrdv {
+  --hsrdv-tile-width: 486px;
+  --hsrdv-tile-height: 62px;
+  --hsrdv-gem-width: 62px;
+  --hsrdv-count-width: 44px;
+  --hsrdv-art-right: 40px;
+  --hsrdv-name-left: 10px;
+  --hsrdv-black: #000;
+  --hsrdv-frame-bg: #313131;
+  --hsrdv-free: #858585;
+  --hsrdv-common: #858585;
+  --hsrdv-rare: #315376;
+  --hsrdv-epic: #644c82;
+  --hsrdv-legendary: #866027;
+  --hsrdv-gold: #f7db48;
+  --hsrdv-text-shadow:
+    -2px -2px 0 var(--hsrdv-black),
+    2px -2px 0 var(--hsrdv-black),
+    -2px 2px 0 var(--hsrdv-black),
+    2px 2px 0 var(--hsrdv-black),
+    0 3px 0 var(--hsrdv-black);
+  width: min(100%, var(--hsrdv-tile-width));
+}
+
+.hsrdv,
+.hsrdv * {
+  box-sizing: border-box;
+}
+
+.hsrdv-list {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hsrdv-list > li {
+  margin: 1px 0 0;
+  padding: 0;
+}
+
+.hsrdv-list > li:first-child {
+  margin-top: 0;
+}
+
+.hsrdv-card-tile {
+  display: flex;
+  width: 100%;
+  height: var(--hsrdv-tile-height);
+  margin: 0;
+  color: #fff;
+  position: relative;
+  text-align: left;
+  cursor: default;
+  text-shadow: var(--hsrdv-text-shadow);
+}
+
+.hsrdv-card-gem {
+  flex: 0 0 var(--hsrdv-gem-width);
+  height: 100%;
+  position: relative;
+  background: var(--hsrdv-rare);
+  border-style: solid;
+  border-color: var(--hsrdv-black);
+  border-width: 1px 0 1px 1px;
+}
+
+.hsrdv-rarity-free {
+  background: var(--hsrdv-free);
+}
+
+.hsrdv-rarity-common {
+  background: var(--hsrdv-common);
+}
+
+.hsrdv-rarity-rare {
+  background: var(--hsrdv-rare);
+}
+
+.hsrdv-rarity-epic {
+  background: var(--hsrdv-epic);
+}
+
+.hsrdv-rarity-legendary {
+  background: var(--hsrdv-legendary);
+}
+
+.hsrdv-card-cost {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 2.05rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.hsrdv-card-frame {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: var(--hsrdv-frame-bg);
+  border: solid 1px var(--hsrdv-black);
+}
+
+.hsrdv-card-art {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  object-fit: cover;
+  background-color: var(--hsrdv-frame-bg);
+}
+
+.hsrdv-card-frame--with-count .hsrdv-card-art {
+  right: var(--hsrdv-art-right);
+}
+
+.hsrdv-card-countbox {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  width: var(--hsrdv-count-width);
+  height: 100%;
+  background-color: var(--hsrdv-frame-bg);
+  border-left: solid 1px var(--hsrdv-black);
+}
+
+.hsrdv-card-count {
+  position: absolute;
+  inset: -5px 0 0;
+  width: 100%;
+  color: var(--hsrdv-gold);
+  font-size: 2.15rem;
+  font-weight: 900;
+  line-height: var(--hsrdv-tile-height);
+  text-align: center;
+}
+
+.hsrdv-card-count--copies {
+  inset-block-start: 0;
+  font-size: 1.9rem;
+}
+
+.hsrdv-card-fade {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+}
+
+.hsrdv-card-frame--with-count .hsrdv-card-fade {
+  background:
+    linear-gradient(
+      65deg,
+      rgb(49 49 9) 0%,
+      rgb(49 49 49) calc(100% - 216px),
+      rgb(49 49 49 / 0%) calc(100% - 90px),
+      rgb(49 49 49 / 0%) 100%
+    );
+}
+
+.hsrdv-card-frame--without-count .hsrdv-card-fade {
+  background:
+    linear-gradient(
+      65deg,
+      rgb(49 49 9) 0%,
+      rgb(49 49 49) calc(100% - 190px),
+      rgb(49 49 49 / 0%) calc(100% - 68px),
+      rgb(49 49 49 / 0%) 100%
+    );
+}
+
+.hsrdv-card-name {
+  position: absolute;
+  z-index: 4;
+  left: var(--hsrdv-name-left);
+  top: 50%;
+  width: calc(100% - var(--hsrdv-name-left) - 8px);
+  overflow: hidden;
+  color: #fff;
+  font-size: clamp(1rem, 4.4vw, 1.42rem);
+  font-weight: 900;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+
+.hsrdv-card-frame--with-count .hsrdv-card-name {
+  width: calc(100% - var(--hsrdv-count-width) - var(--hsrdv-name-left) - 2px);
+}
+
+.hsrdv-card-tile:hover .hsrdv-card-art {
+  filter: brightness(115%);
+}
+
+.hsrdv-card-tile.hsrdv-card-tile--predicted {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+@media (max-width: 520px) {
+  .hsrdv {
+    --hsrdv-tile-height: 52px;
+    --hsrdv-gem-width: 52px;
+    --hsrdv-count-width: 38px;
+    --hsrdv-art-right: 34px;
+  }
+
+  .hsrdv-card-cost {
+    font-size: 1.75rem;
+  }
+
+  .hsrdv-card-count {
+    inset-block-start: -4px;
+    font-size: 1.85rem;
+    line-height: var(--hsrdv-tile-height);
+  }
+
+  .hsrdv-card-count--copies {
+    inset-block-start: 0;
+    font-size: 1.65rem;
+  }
+}

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HSReplay deck view pattern</title>
+  <script>
+    document.documentElement.dataset.view = new URLSearchParams(location.search).get("view") || "all";
+  </script>
+  <link rel="preconnect" href="https://api.hearthstonejson.com">
+  <link rel="preconnect" href="https://art.hearthstonejson.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/hsreplay-deck-view.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      background: #f4f6f8;
+      color: #152033;
+      font-family: "Noto Sans", Arial, sans-serif;
+    }
+
+    .demo-shell {
+      width: min(1120px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    .demo-header {
+      margin-bottom: 22px;
+    }
+
+    .demo-header h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      line-height: 1.05;
+    }
+
+    .demo-header p {
+      max-width: 720px;
+      margin: 8px 0 0;
+      color: #4b5566;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 486px) minmax(300px, 486px);
+      gap: 26px;
+      align-items: start;
+    }
+
+    .demo-section {
+      min-width: 0;
+    }
+
+    .demo-section h2 {
+      margin: 0 0 12px;
+      color: #1a2940;
+      font-size: 1.1rem;
+      line-height: 1.2;
+    }
+
+    .demo-note {
+      margin: 12px 0 0;
+      color: #5e6877;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .demo-stack {
+      display: grid;
+      gap: 24px;
+    }
+
+    .demo-loading,
+    .demo-error {
+      width: min(100%, 486px);
+      min-height: 62px;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      background: #e8edf2;
+      border: 1px solid #cbd5df;
+      color: #344055;
+      font-weight: 700;
+    }
+
+    .demo-error {
+      border-color: #b84848;
+      color: #8f2929;
+      background: #f9eaea;
+    }
+
+    html[data-view="deck"] .showcase-section,
+    html[data-view="showcase"] .deck-section,
+    html[data-view="deck"] .demo-header,
+    html[data-view="showcase"] .demo-header {
+      display: none;
+    }
+
+    html[data-view="deck"] .demo-grid,
+    html[data-view="showcase"] .demo-grid {
+      display: block;
+      width: min(100%, 486px);
+      margin: 0 auto;
+    }
+
+    @media (max-width: 860px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="demo-shell">
+    <header class="demo-header">
+      <h1>HSReplay deck view pattern</h1>
+      <p>
+        Переиспользуемый HTML/CSS/JS-паттерн для Hearthstone-плиток в стиле HSReplay:
+        стоимость слева, затемненный tile-art, название с ellipsis и счетчик или звезда справа.
+      </p>
+    </header>
+
+    <div class="demo-grid">
+      <section class="demo-section deck-section" aria-labelledby="deck-title">
+        <h2 id="deck-title">Deck list from data-deck-cards</h2>
+        <div id="sample-deck" class="demo-loading">Loading HearthstoneJSON...</div>
+        <p class="demo-note">
+          Этот список строится из строки dbfId, как в HTML HSReplay:
+          <code>data-deck-cards="69521,69521,69623..."</code>.
+        </p>
+      </section>
+
+      <section class="demo-section showcase-section" aria-labelledby="showcase-title">
+        <h2 id="showcase-title">Rarities and mana costs</h2>
+        <div class="demo-stack">
+          <div>
+            <h2>All rarities</h2>
+            <div id="rarity-showcase"></div>
+          </div>
+          <div>
+            <h2>Costs 0-10</h2>
+            <div id="cost-showcase"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="src/hsreplay-deck-view.js"></script>
+  <script>
+    const DECK_DBF_IDS = [
+      69521, 69521, 69623, 69623, 126088, 123060, 123060, 120647, 120647,
+      102227, 102227, 115088, 115088, 117697, 117697, 102745, 123605,
+      123605, 123549, 123549, 117762, 119532, 125450, 122832, 124150,
+      114849, 115090, 123072, 123072, 125467
+    ];
+
+    const RARITY_CARDS = [
+      { id: "Core_CS2_008", name: "Лунный огонь", cost: 0, rarity: "FREE", count: 1 },
+      { id: "AT_006", name: "Боец из Даларана", cost: 4, rarity: "COMMON", count: 2 },
+      { id: "AT_003", name: "Павший герой", cost: 2, rarity: "RARE", count: 2 },
+      { id: "AT_061", name: "На изготовку!", cost: 0, rarity: "EPIC", count: 2 },
+      { id: "AT_072", name: "Вариан Ринн", cost: 10, rarity: "LEGENDARY", elite: true, count: 1 }
+    ];
+
+    const COST_CARDS = [
+      { id: "AT_061", name: "На изготовку!", cost: 0, rarity: "EPIC", count: 2 },
+      { id: "AT_004", name: "Чародейская вспышка", cost: 1, rarity: "EPIC", count: 2 },
+      { id: "AT_003", name: "Павший герой", cost: 2, rarity: "RARE", count: 2 },
+      { id: "AT_002", name: "Чучело", cost: 3, rarity: "RARE", count: 2 },
+      { id: "AT_006", name: "Боец из Даларана", cost: 4, rarity: "COMMON", count: 2 },
+      { id: "AT_001", name: "Огненное копье", cost: 5, rarity: "COMMON", count: 2 },
+      { id: "AT_008", name: "Дракон Хладарры", cost: 6, rarity: "EPIC", count: 2 },
+      { id: "AT_018", name: "Исповедница Пейлтресс", cost: 7, rarity: "LEGENDARY", elite: true, count: 1 },
+      { id: "AT_009", name: "Ронин", cost: 8, rarity: "LEGENDARY", elite: true, count: 1 },
+      { id: "AT_045", name: "Авиана", cost: 9, rarity: "LEGENDARY", elite: true, count: 1 },
+      { id: "AT_072", name: "Вариан Ринн", cost: 10, rarity: "LEGENDARY", elite: true, count: 1 }
+    ];
+
+    function showError(target, error) {
+      const element = document.querySelector(target);
+      element.className = "demo-error";
+      element.textContent = error.message;
+    }
+
+    const sampleDeckElement = document.querySelector("#sample-deck");
+
+    HSReplayDeckView.renderDeckFromDbfIds("#sample-deck", DECK_DBF_IDS, {
+      locale: "ruRU"
+    })
+      .then(() => {
+        sampleDeckElement.className = "";
+      })
+      .catch((error) => showError("#sample-deck", error));
+
+    HSReplayDeckView.renderDeck("#rarity-showcase", RARITY_CARDS, {
+      group: false,
+      sort: false
+    });
+
+    HSReplayDeckView.renderDeck("#cost-showcase", COST_CARDS, {
+      group: false,
+      sort: false
+    });
+  </script>
+</body>
+</html>
