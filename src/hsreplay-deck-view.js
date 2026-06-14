@@ -18,7 +18,8 @@
     clear: true,
     showLegendaryAsStar: true,
     showSingleCountBox: false,
-    imageFallbackFormat: "png"
+    imageFallbackFormat: "png",
+    iconBadgeSingleCount: false
   };
 
   const RARITY_ORDER = {
@@ -144,6 +145,24 @@
     return String(card.count);
   }
 
+  function getIconBadgeLabel(card, options) {
+    if (options.showLegendaryAsStar && card.elite && card.count === 1) {
+      return "★";
+    }
+    if (card.count > 1) {
+      return `×${card.count}`;
+    }
+    if (options.iconBadgeSingleCount) {
+      return String(card.count);
+    }
+    return "";
+  }
+
+  function prepareCards(cards, options) {
+    const normalized = options.group ? groupCards(cards) : cards.map(normalizeCard);
+    return options.sort ? sortCards(normalized) : normalized;
+  }
+
   function createTile(rawCard, options) {
     const card = normalizeCard(rawCard);
     const settings = withDefaults(options);
@@ -204,17 +223,70 @@
     return tile;
   }
 
+  function createIcon(rawCard, options) {
+    const card = normalizeCard(rawCard);
+    const settings = withDefaults(options);
+    const badgeLabel = getIconBadgeLabel(card, settings);
+    const icon = createElement(
+      "div",
+      `hsrdv-card-icon hsrdv-rarity-${card.rarity}${card.predicted ? " hsrdv-card-icon--predicted" : ""}`
+    );
+    icon.setAttribute("role", "img");
+    icon.setAttribute("aria-label", badgeLabel ? `${card.name} ${badgeLabel}` : card.name);
+    if (card.dbfId) {
+      icon.dataset.dbfId = String(card.dbfId);
+    }
+    if (card.id) {
+      icon.dataset.cardId = card.id;
+    }
+
+    const artUrl = getArtUrl(card, settings);
+    if (artUrl) {
+      icon.style.backgroundImage = `url("${artUrl}")`;
+    }
+
+    if (badgeLabel) {
+      const badgeClass = badgeLabel === "★"
+        ? "hsrdv-card-icon-badge hsrdv-card-icon-badge--star"
+        : "hsrdv-card-icon-badge hsrdv-card-icon-badge--copies";
+      icon.appendChild(createElement("span", badgeClass, badgeLabel));
+    }
+
+    return icon;
+  }
+
   function renderDeck(target, cards, options) {
     const settings = withDefaults(options);
     const container = resolveTarget(target);
-    const normalized = settings.group ? groupCards(cards) : cards.map(normalizeCard);
-    const renderCards = settings.sort ? sortCards(normalized) : normalized;
+    const renderCards = prepareCards(cards, settings);
     const rootElement = createElement("div", `hsrdv ${settings.className}`.trim());
     const list = createElement("ul", "hsrdv-list");
 
     renderCards.forEach((card) => {
       const item = createElement("li");
       item.appendChild(createTile(card, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
+  function renderIcons(target, cards, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const renderCards = prepareCards(cards, settings);
+    const rootElement = createElement("div", `hsrdv hsrdv-icons ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-icon-list");
+
+    renderCards.forEach((card) => {
+      const item = createElement("li");
+      item.appendChild(createIcon(card, settings));
       list.appendChild(item);
     });
 
@@ -259,7 +331,13 @@
     return renderDeck(target, cards, options);
   }
 
+  async function renderIconsFromDbfIds(target, dbfIds, options) {
+    const cards = await cardsFromDbfIds(dbfIds, options);
+    return renderIcons(target, cards, options);
+  }
+
   return {
+    createIcon,
     createTile,
     cardsFromDbfIds,
     groupCards,
@@ -268,6 +346,8 @@
     parseDeckCards,
     renderDeck,
     renderDeckFromDbfIds,
+    renderIcons,
+    renderIconsFromDbfIds,
     sortCards
   };
 });
