@@ -25,6 +25,10 @@
   --hsrdv-archetype-panel-gap: 4px;
   --hsrdv-archetype-art-opacity: 0.28;
   --hsrdv-archetype-icon-size: 54px;
+  --hsrdv-stone-portrait-size: 80px;
+  --hsrdv-stone-portrait-gap: 12px;
+  --hsrdv-stone-portrait-art-inset: 12px;
+  --hsrdv-stone-portrait-frame-image: url("https://static.hsreplay.net/static/webpack/assets/images/battlegrounds/minion-frame.d21732172d83faeae997.png");
   --hsrdv-icon-badge-shadow:
     -1px -1px 0 var(--hsrdv-black),
     1px -1px 0 var(--hsrdv-black),
@@ -381,6 +385,96 @@
   filter: grayscale(1);
 }
 
+.hsrdv-stone-portraits {
+  width: 100%;
+  max-width: none;
+}
+
+.hsrdv-stone-portrait-list {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  gap: var(--hsrdv-stone-portrait-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.hsrdv-stone-portrait-list > li {
+  flex: 0 0 auto;
+  width: var(--hsrdv-stone-portrait-size);
+  height: var(--hsrdv-stone-portrait-size);
+  margin: 0;
+  padding: 0;
+  list-style: inherit;
+}
+
+.hsrdv-stone-portrait {
+  position: relative;
+  display: flex;
+  width: var(--hsrdv-stone-portrait-size);
+  height: var(--hsrdv-stone-portrait-size);
+  aspect-ratio: 1 / 1;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  isolation: isolate;
+  text-decoration: none;
+}
+
+.hsrdv-stone-portrait::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: var(--hsrdv-stone-portrait-frame-image);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+.hsrdv-stone-portrait::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: var(--hsrdv-stone-portrait-art-inset);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 10px rgb(0 0 0 / 58%),
+    0 2px 3px rgb(0 0 0 / 24%);
+  pointer-events: none;
+}
+
+.hsrdv-stone-portrait-art {
+  position: absolute;
+  z-index: 0;
+  inset: var(--hsrdv-stone-portrait-art-inset);
+  width: calc(100% - (var(--hsrdv-stone-portrait-art-inset) * 2));
+  height: calc(100% - (var(--hsrdv-stone-portrait-art-inset) * 2));
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.05);
+}
+
+.hsrdv-stone-portrait:hover .hsrdv-stone-portrait-art {
+  filter: brightness(112%);
+}
+
+.hsrdv-stone-portrait--predicted {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
 .hsrdv-archetypes {
   width: 100%;
   max-width: none;
@@ -572,6 +666,9 @@
     --hsrdv-archetype-height: 64px;
     --hsrdv-archetype-icon-size: 46px;
     --hsrdv-archetype-panel-width: 88px;
+    --hsrdv-stone-portrait-size: 72px;
+    --hsrdv-stone-portrait-gap: 10px;
+    --hsrdv-stone-portrait-art-inset: 11px;
   }
 
   .hsrdv-card-cost {

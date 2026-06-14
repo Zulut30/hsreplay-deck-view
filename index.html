@@ -6,7 +6,7 @@
   <title>HSReplay Deck View Components</title>
   <meta
     name="description"
-    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, карточки архетипов."
+    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, карточки архетипов и каменные портреты Battlegrounds."
   >
   <script>
     document.documentElement.dataset.view = new URLSearchParams(location.search).get("view") || "all";
@@ -32,6 +32,7 @@
       <a href="#tiles">Плитки</a>
       <a href="#icons">Иконки</a>
       <a href="#archetypes">Архетипы</a>
+      <a href="#stone">Камни</a>
       <a href="#api">API</a>
       <a class="site-nav-github" href="https://github.com/Zulut30/hsreplay-deck-view">GitHub</a>
     </nav>
@@ -79,6 +80,14 @@
             <strong>layered background arts</strong>
           </div>
           <div id="hero-archetype" class="archetype-preview"></div>
+        </article>
+
+        <article class="component-card component-card--stone">
+          <div class="component-card-head">
+            <span>Stone portrait</span>
+            <strong>battlegrounds frame</strong>
+          </div>
+          <div id="hero-stone" class="stone-preview"></div>
         </article>
       </div>
     </section>
@@ -139,6 +148,24 @@
       </div>
     </section>
 
+    <section id="stone" class="site-section detail-section detail-section--wide" aria-labelledby="stone-title">
+      <div class="section-copy">
+        <div class="section-kicker">Variant 05</div>
+        <h2 id="stone-title">Каменный круг</h2>
+        <p>
+          Большой Battlegrounds-портрет: арт карты из `256x`, круглая маска и каменная
+          рамка `minion-frame` поверх изображения.
+        </p>
+      </div>
+      <div class="stone-comp-showcase">
+        <div id="sample-stone"></div>
+        <div class="stone-comp-copy">
+          <h3>Dragon cycle</h3>
+          <p>Крупный портрет для композиции, героя или ключевой карты.</p>
+        </div>
+      </div>
+    </section>
+
     <section id="reference" class="site-section reference-section" aria-labelledby="reference-title">
       <div class="section-copy">
         <div class="section-kicker">Reference</div>
@@ -174,6 +201,7 @@
   HSReplayDeckView.renderIcons("#icons", cards);
   HSReplayDeckView.renderSquareIcons("#squares", cards);
   HSReplayDeckView.renderArchetypes("#archetypes", archetypes);
+  HSReplayDeckView.renderStonePortraits("#stone", portraits);
 &lt;/script&gt;</code></pre>
     </section>
   </main>

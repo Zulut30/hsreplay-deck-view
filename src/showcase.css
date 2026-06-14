@@ -211,7 +211,7 @@ p {
 }
 
 .component-card--deck {
-  grid-row: span 3;
+  grid-row: span 4;
 }
 
 .component-card-head {
@@ -249,16 +249,19 @@ p {
 
 .icons-preview,
 .squares-preview,
-.archetype-preview {
+.archetype-preview,
+.stone-preview {
   min-width: 0;
 }
 
 .icons-preview .hsrdv,
 .squares-preview .hsrdv,
 .archetype-preview .hsrdv,
+.stone-preview .hsrdv,
 .deck-row-strip .hsrdv,
 .square-ribbon .hsrdv,
-.archetype-board .hsrdv {
+.archetype-board .hsrdv,
+.stone-comp-showcase .hsrdv {
   max-width: none;
 }
 
@@ -287,6 +290,18 @@ p {
   --hsrdv-archetype-art-opacity: 0.42;
 }
 
+.stone-preview {
+  display: flex;
+  align-items: center;
+  min-height: 84px;
+  padding: 8px 0;
+}
+
+.stone-preview .hsrdv {
+  --hsrdv-stone-portrait-size: 80px;
+  --hsrdv-stone-portrait-gap: 12px;
+}
+
 .detail-section,
 .reference-section,
 .api-section {
@@ -310,6 +325,7 @@ p {
 .deck-row-showcase,
 .square-ribbon,
 .archetype-board,
+.stone-comp-showcase,
 .api-section pre {
   min-width: 0;
   border: 1px solid var(--site-line);
@@ -380,6 +396,49 @@ p {
 
 .archetype-board .hsrdv {
   --hsrdv-archetype-art-opacity: 0.42;
+}
+
+.stone-comp-showcase {
+  min-height: 134px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+  padding: 22px 26px;
+  background:
+    linear-gradient(90deg, rgb(45 31 68 / 88%), rgb(78 43 88 / 78%)),
+    url("https://art.hearthstonejson.com/v1/256x/BGS_018.webp") 32% 35% / 360px auto no-repeat;
+  color: #fff;
+}
+
+.stone-comp-showcase .hsrdv {
+  --hsrdv-stone-portrait-size: 92px;
+  --hsrdv-stone-portrait-gap: 14px;
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.stone-comp-showcase .hsrdv-stone-portrait-list {
+  width: auto;
+  overflow: visible;
+}
+
+.stone-comp-copy {
+  min-width: 0;
+}
+
+.stone-comp-copy h3 {
+  margin-bottom: 5px;
+  color: #fff;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  line-height: 1.02;
+}
+
+.stone-comp-copy p {
+  margin: 0;
+  color: rgb(255 255 255 / 76%);
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .reference-grid {
@@ -487,17 +546,32 @@ p {
     --hsrdv-icon-size: 48px;
     --hsrdv-icon-gap: 15px;
   }
+
+  .stone-comp-showcase {
+    gap: 14px;
+    padding: 18px 16px;
+  }
+
+  .stone-comp-showcase .hsrdv {
+    --hsrdv-stone-portrait-size: 80px;
+  }
+
+  .stone-comp-copy h3 {
+    font-size: 1.45rem;
+  }
 }
 
 html[data-view="deck"] .site-top,
 html[data-view="icons"] .site-top,
 html[data-view="squares"] .site-top,
 html[data-view="archetypes"] .site-top,
+html[data-view="stone"] .site-top,
 html[data-view="showcase"] .site-top,
 html[data-view="deck"] .site-footer,
 html[data-view="icons"] .site-footer,
 html[data-view="squares"] .site-footer,
 html[data-view="archetypes"] .site-footer,
+html[data-view="stone"] .site-footer,
 html[data-view="showcase"] .site-footer {
   display: none;
 }
@@ -506,6 +580,7 @@ html[data-view="deck"] .site-main,
 html[data-view="icons"] .site-main,
 html[data-view="squares"] .site-main,
 html[data-view="archetypes"] .site-main,
+html[data-view="stone"] .site-main,
 html[data-view="showcase"] .site-main {
   width: min(100vw - 16px, 1180px);
   padding: 4px 0 0;
@@ -515,6 +590,7 @@ html[data-view="deck"] .site-section,
 html[data-view="icons"] .site-section,
 html[data-view="squares"] .site-section,
 html[data-view="archetypes"] .site-section,
+html[data-view="stone"] .site-section,
 html[data-view="showcase"] .site-section {
   margin-top: 0;
 }
@@ -523,6 +599,7 @@ html[data-view="deck"] .site-section:not(#tiles),
 html[data-view="icons"] .site-section:not(#icons),
 html[data-view="squares"] .site-section:not(#squares),
 html[data-view="archetypes"] .site-section:not(#archetypes),
+html[data-view="stone"] .site-section:not(#stone),
 html[data-view="showcase"] .site-section:not(#reference) {
   display: none;
 }
@@ -531,6 +608,7 @@ html[data-view="deck"] .section-copy,
 html[data-view="icons"] .section-copy,
 html[data-view="squares"] .section-copy,
 html[data-view="archetypes"] .section-copy,
+html[data-view="stone"] .section-copy,
 html[data-view="showcase"] .section-copy {
   display: none;
 }
@@ -539,6 +617,7 @@ html[data-view="deck"] .detail-section,
 html[data-view="icons"] .detail-section,
 html[data-view="squares"] .detail-section,
 html[data-view="archetypes"] .detail-section,
+html[data-view="stone"] .detail-section,
 html[data-view="showcase"] .reference-section {
   display: block;
   padding-top: 0;
@@ -551,6 +630,7 @@ html[data-view="deck"] .demo-surface--deck {
 html[data-view="icons"] .deck-row-showcase,
 html[data-view="squares"] .square-ribbon,
 html[data-view="archetypes"] .archetype-board,
+html[data-view="stone"] .stone-comp-showcase,
 html[data-view="showcase"] .reference-grid {
   box-shadow: none;
 }

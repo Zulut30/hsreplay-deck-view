@@ -1,6 +1,6 @@
 # HSReplay Deck View
 
-Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых/квадратных иконок и строка архетипа с несколькими артами на фоне через диагональные разделители.
+Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых/квадратных иконок, строка архетипа с несколькими артами на фоне через диагональные разделители и большой каменный Battlegrounds-портрет.
 
 Проект не требует сборки и фреймворков. Достаточно подключить CSS и JS.
 
@@ -27,6 +27,10 @@ GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
 ### Карточка архетипа
 
 ![Archetype card demo](assets/screenshots/archetype-card-demo.png)
+
+### Каменный портрет
+
+![Stone portrait demo](assets/screenshots/stone-portrait-demo.png)
 
 ### Все редкости и стоимости 0-10
 
@@ -147,6 +151,43 @@ GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
 }
 ```
 
+## Каменные портреты Battlegrounds
+
+Пятый режим повторяет HSReplay-паттерн из battlegrounds comps: внешний контейнер `80px`, арт карты из `256x/{id}.webp` внутри круглой маски и каменная рамка `minion-frame` поверх изображения через `::before`.
+
+```html
+<link rel="stylesheet" href="src/hsreplay-deck-view.css">
+<div id="stone-portrait"></div>
+<script src="src/hsreplay-deck-view.js"></script>
+<script>
+  HSReplayDeckView.renderStonePortraits("#stone-portrait", [
+    {
+      id: "BGS_018",
+      name: "Голдринн, Великий волк",
+      position: "50% 34%"
+    }
+  ]);
+</script>
+```
+
+Полезные CSS-переменные:
+
+```css
+#stone-portrait .hsrdv {
+  --hsrdv-stone-portrait-size: 80px;
+  --hsrdv-stone-portrait-gap: 12px;
+  --hsrdv-stone-portrait-art-inset: 12px;
+}
+```
+
+Если надо подменить рамку на локальную копию:
+
+```js
+HSReplayDeckView.renderStonePortraits("#stone-portrait", portraits, {
+  stonePortraitFrameImage: "/images/minion-frame.png"
+});
+```
+
 ## Готовые объекты карт
 
 Если на сайте уже есть данные карт, можно не грузить HearthstoneJSON:
@@ -233,6 +274,18 @@ HSReplayDeckView.renderArchetypes(target, archetypes, options)
 Рендерит список карточек архетипов из готовых объектов.
 
 ```js
+HSReplayDeckView.renderStonePortraits(target, portraits, options)
+```
+
+Рендерит список больших каменных портретов из готовых объектов, card id или прямых URL изображений.
+
+```js
+HSReplayDeckView.renderStonePortraitsFromDbfIds(target, dbfIds, options)
+```
+
+Рендерит каменные портреты из массива dbfId или строки. Для Battlegrounds-карт чаще удобнее передавать готовые `id`, потому что стандартный `dataUrl` указывает на collectible JSON.
+
+```js
 HSReplayDeckView.cardsFromDbfIds(dbfIds, options)
 ```
 
@@ -262,6 +315,12 @@ HSReplayDeckView.createArchetypeCard(archetype, options)
 
 Возвращает DOM-элемент одной карточки архетипа.
 
+```js
+HSReplayDeckView.createStonePortrait(portrait, options)
+```
+
+Возвращает DOM-элемент одного каменного портрета.
+
 Основные опции:
 
 | Опция | По умолчанию | Назначение |
@@ -279,6 +338,9 @@ HSReplayDeckView.createArchetypeCard(archetype, options)
 | `archetypeArtFormat` | `webp` | Формат фоновых артов архетипа |
 | `archetypeIconBaseUrl` | HearthstoneJSON tiles CDN | База URL для круглой иконки архетипа |
 | `archetypeIconFormat` | `webp` | Формат круглой иконки архетипа |
+| `stonePortraitArtBaseUrl` | HearthstoneJSON 256x CDN | База URL для арта каменного портрета |
+| `stonePortraitArtFormat` | `webp` | Формат арта каменного портрета |
+| `stonePortraitFrameImage` | HSReplay minion frame | URL каменной рамки |
 
 ## HTML-паттерн одной плитки
 
@@ -365,6 +427,24 @@ JS генерирует такую структуру:
 </ul>
 ```
 
+## HTML-паттерн каменного портрета
+
+```html
+<ul class="hsrdv-stone-portrait-list">
+  <li>
+    <div class="hsrdv-stone-portrait" aria-label="Голдринн, Великий волк" data-card-id="BGS_018">
+      <img
+        class="hsrdv-stone-portrait-art"
+        src="https://art.hearthstonejson.com/v1/256x/BGS_018.webp"
+        alt="Голдринн, Великий волк"
+      >
+    </div>
+  </li>
+</ul>
+```
+
+Каменная рамка живет в `.hsrdv-stone-portrait::before`, поэтому DOM остается легким: контейнер + один `img`.
+
 ## Демо и скриншоты
 
 Открыть локально:
@@ -409,6 +489,7 @@ npm run serve
 
 - Данные карт: `https://api.hearthstonejson.com/v1/latest/{locale}/cards.collectible.json`
 - Tile-art: `https://art.hearthstonejson.com/v1/tiles/{cardId}.webp`
-- Full art для архетипов: `https://art.hearthstonejson.com/v1/256x/{cardId}.webp`
+- Full art для архетипов и каменных портретов: `https://art.hearthstonejson.com/v1/256x/{cardId}.webp`
+- Каменная рамка: `https://static.hsreplay.net/static/webpack/assets/images/battlegrounds/minion-frame.d21732172d83faeae997.png`
 
-Для сайтов, где нельзя зависеть от внешних CDN, передавайте свои поля `image` и готовые данные карт в `renderDeck`, а для архетипов используйте прямые URL в `icon` и `arts`.
+Для сайтов, где нельзя зависеть от внешних CDN, передавайте свои поля `image` и готовые данные карт в `renderDeck`, для архетипов используйте прямые URL в `icon` и `arts`, а для каменных портретов подменяйте `stonePortraitFrameImage`.

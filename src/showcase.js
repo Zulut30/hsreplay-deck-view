@@ -85,6 +85,14 @@
     }
   ];
 
+  const STONE_PORTRAITS = [
+    {
+      id: "BGS_018",
+      name: "Голдринн, Великий волк",
+      position: "50% 34%"
+    }
+  ];
+
   function render() {
     const api = window.HSReplayDeckView;
     if (!api) {
@@ -108,6 +116,7 @@
       icon: archetype.icon,
       arts: archetype.arts
     })));
+    api.renderStonePortraits("#hero-stone", STONE_PORTRAITS);
 
     api.renderDeck("#sample-deck", DECK_CARDS, {
       group: false,
@@ -122,6 +131,7 @@
       sort: false
     });
     api.renderArchetypes("#sample-archetypes", ARCHETYPES);
+    api.renderStonePortraits("#sample-stone", STONE_PORTRAITS);
 
     api.renderDeck("#rarity-showcase", RARITY_CARDS, {
       group: false,

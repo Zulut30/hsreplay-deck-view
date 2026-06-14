@@ -23,7 +23,10 @@
     archetypeArtBaseUrl: "https://art.hearthstonejson.com/v1/256x/",
     archetypeArtFormat: "webp",
     archetypeIconBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
-    archetypeIconFormat: "webp"
+    archetypeIconFormat: "webp",
+    stonePortraitArtBaseUrl: "https://art.hearthstonejson.com/v1/256x/",
+    stonePortraitArtFormat: "webp",
+    stonePortraitFrameImage: "https://static.hsreplay.net/static/webpack/assets/images/battlegrounds/minion-frame.d21732172d83faeae997.png"
   };
 
   const RARITY_ORDER = {
@@ -174,6 +177,16 @@
     return getArtworkUrl(artwork, options.archetypeIconBaseUrl, options.archetypeIconFormat);
   }
 
+  function getStonePortraitArtUrl(portrait, options) {
+    if (portrait.image) {
+      return portrait.image;
+    }
+    if (!portrait.id) {
+      return "";
+    }
+    return `${options.stonePortraitArtBaseUrl}${portrait.id}.${options.stonePortraitArtFormat}`;
+  }
+
   function createElement(tagName, className, text) {
     const element = document.createElement(tagName);
     if (className) {
@@ -244,6 +257,34 @@
       stats: Array.isArray(raw.stats) ? raw.stats : [],
       url: raw.url || raw.href || "",
       label: raw.label || raw.ariaLabel || ""
+    };
+  }
+
+  function normalizeStonePortrait(portrait) {
+    if (typeof portrait === "string") {
+      const value = portrait.trim();
+      const isImage = isDirectImageUrl(value);
+      return {
+        id: isImage ? "" : value,
+        dbfId: null,
+        name: value || "Unknown card",
+        image: isImage ? value : "",
+        href: "",
+        position: "",
+        predicted: false
+      };
+    }
+
+    const raw = portrait || {};
+    const id = String(raw.id || raw.cardId || raw.card_id || "").trim();
+    return {
+      id,
+      dbfId: raw.dbfId || raw.dbf_id || null,
+      name: raw.name || raw.title || id || "Unknown card",
+      image: raw.image || raw.imageUrl || raw.art || raw.src || raw.portrait || raw.url || "",
+      href: raw.href || "",
+      position: raw.position || raw.objectPosition || raw.imagePosition || "",
+      predicted: Boolean(raw.predicted)
     };
   }
 
@@ -439,6 +480,38 @@
     return element;
   }
 
+  function createStonePortrait(rawPortrait, options) {
+    const settings = withDefaults(options);
+    const portrait = normalizeStonePortrait(rawPortrait);
+    const element = createElement(
+      portrait.href ? "a" : "div",
+      `hsrdv-stone-portrait${portrait.predicted ? " hsrdv-stone-portrait--predicted" : ""}`
+    );
+    element.setAttribute("aria-label", portrait.name);
+    if (portrait.href) {
+      element.href = portrait.href;
+    }
+    if (portrait.dbfId) {
+      element.dataset.dbfId = String(portrait.dbfId);
+    }
+    if (portrait.id) {
+      element.dataset.cardId = portrait.id;
+    }
+
+    const artUrl = getStonePortraitArtUrl(portrait, settings);
+    if (artUrl) {
+      const image = createElement("img", "hsrdv-stone-portrait-art");
+      image.src = artUrl;
+      image.alt = portrait.name;
+      if (portrait.position) {
+        image.style.objectPosition = portrait.position;
+      }
+      element.appendChild(image);
+    }
+
+    return element;
+  }
+
   function renderDeck(target, cards, options) {
     const settings = withDefaults(options);
     const container = resolveTarget(target);
@@ -526,6 +599,34 @@
     return rootElement;
   }
 
+  function renderStonePortraits(target, portraits, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const rootElement = createElement("div", `hsrdv hsrdv-stone-portraits ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-stone-portrait-list");
+
+    if (settings.stonePortraitFrameImage) {
+      rootElement.style.setProperty(
+        "--hsrdv-stone-portrait-frame-image",
+        `url("${settings.stonePortraitFrameImage}")`
+      );
+    }
+
+    (portraits || []).forEach((portrait) => {
+      const item = createElement("li");
+      item.appendChild(createStonePortrait(portrait, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
   async function loadCardDatabase(options) {
     const settings = withDefaults(options);
     const url = settings.dataUrl.replace("{locale}", settings.locale);
@@ -568,15 +669,22 @@
     return renderSquareIcons(target, cards, options);
   }
 
+  async function renderStonePortraitsFromDbfIds(target, dbfIds, options) {
+    const cards = await cardsFromDbfIds(dbfIds, options);
+    return renderStonePortraits(target, cards, options);
+  }
+
   return {
     createArchetypeCard,
     createIcon,
     createSquareIcon,
+    createStonePortrait,
     createTile,
     cardsFromDbfIds,
     groupCards,
     loadCardDatabase,
     normalizeCard,
+    normalizeStonePortrait,
     parseDeckCards,
     renderDeck,
     renderDeckFromDbfIds,
@@ -585,6 +693,8 @@
     renderIconsFromDbfIds,
     renderSquareIcons,
     renderSquareIconsFromDbfIds,
+    renderStonePortraits,
+    renderStonePortraitsFromDbfIds,
     sortCards
   };
 });
