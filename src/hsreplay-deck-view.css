@@ -292,9 +292,9 @@
 }
 
 .hsrdv-card-icon-badge--star {
-  right: calc(var(--hsrdv-icon-size) * -0.2);
-  bottom: calc(var(--hsrdv-icon-size) * -0.27);
-  font-size: calc(var(--hsrdv-icon-size) * 0.68);
+  right: calc(var(--hsrdv-icon-size) * -0.14);
+  bottom: calc(var(--hsrdv-icon-size) * -0.18);
+  font-size: calc(var(--hsrdv-icon-size) * 0.4);
 }
 
 .hsrdv-card-icon:hover {
@@ -371,9 +371,9 @@
 }
 
 .hsrdv-card-square-badge--star {
-  right: calc(var(--hsrdv-square-icon-size) * -0.14);
-  bottom: calc(var(--hsrdv-square-icon-size) * -0.18);
-  font-size: calc(var(--hsrdv-square-icon-size) * 0.52);
+  right: calc(var(--hsrdv-square-icon-size) * -0.12);
+  bottom: calc(var(--hsrdv-square-icon-size) * -0.08);
+  font-size: calc(var(--hsrdv-square-icon-size) * 0.34);
 }
 
 .hsrdv-card-square-icon:hover {
