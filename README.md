@@ -389,7 +389,15 @@ CHROMIUM_BIN=/path/to/chromium npm run screenshots
 
 ## GitHub Pages
 
-В репозитории есть workflow `.github/workflows/pages.yml`. Он публикует статический сайт из корня `main`: `index.html`, `src/`, `assets/` и `.nojekyll`.
+Живая витрина опубликована на GitHub Pages:
+
+https://zulut30.github.io/hsreplay-deck-view/
+
+Сейчас деплой идет из ветки `gh-pages`. После правок в `main` обновить Pages можно так:
+
+```bash
+git push origin main:gh-pages
+```
 
 Локально сайт можно открыть через:
 

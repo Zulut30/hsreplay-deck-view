@@ -263,13 +263,13 @@ p {
 }
 
 .icons-preview .hsrdv {
-  --hsrdv-icon-size: 38px;
-  --hsrdv-icon-gap: 11px;
+  --hsrdv-icon-size: 48px;
+  --hsrdv-icon-gap: 14px;
 }
 
 .icons-preview .hsrdv-icon-list {
   padding-top: 4px;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
 }
 
 .squares-preview .hsrdv {
@@ -332,87 +332,24 @@ p {
 
 .deck-row-showcase {
   overflow: hidden;
-  background: #eef1f4;
-}
-
-.deck-row-profile {
-  min-height: 108px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
   padding: 18px 22px 16px;
   background:
-    linear-gradient(90deg, rgb(255 255 255 / 78%), rgb(245 247 250 / 88%)),
-    url("https://art.hearthstonejson.com/v1/256x/TLC_100.webp") 12% 42% / 380px auto no-repeat;
-  border-bottom: 5px solid var(--site-red);
-}
-
-.profile-icon {
-  width: 56px;
-  height: 56px;
-  flex: 0 0 56px;
-  border: 2px solid #5a5036;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 50%, rgb(255 255 255 / 18%) 0 32%, transparent 33%),
-    url("https://art.hearthstonejson.com/v1/tiles/CORE_EX1_145.webp") -114px 0 / 207px 100% no-repeat;
-  box-shadow:
-    inset 0 0 0 3px #1d1b17,
-    0 1px 2px rgb(0 0 0 / 40%);
-}
-
-.deck-row-profile h3 {
-  margin-bottom: 5px;
-  color: #060708;
-  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-}
-
-.deck-row-profile p {
-  margin: 0;
-  color: #59606a;
-  font-size: 1.02rem;
-  font-weight: 900;
-}
-
-.deck-row-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(90px, 1fr));
-  gap: 12px;
-  margin: 0;
-  padding: 0 22px 18px;
-  text-align: center;
-}
-
-.deck-row-metrics div,
-.deck-row-metrics dt,
-.deck-row-metrics dd {
-  margin: 0;
-}
-
-.deck-row-metrics dt {
-  color: #5e626b;
-  font-size: 0.92rem;
-}
-
-.deck-row-metrics dd {
-  margin-top: 4px;
-  color: #0a0d12;
-  font-size: 1.28rem;
-  font-weight: 900;
-}
-
-.deck-row-metrics .metric-good {
-  color: var(--site-warm);
+    linear-gradient(180deg, rgb(248 250 252), rgb(232 237 243));
+  border-top: 5px solid var(--site-red);
 }
 
 .deck-row-strip {
-  padding: 6px 18px 4px;
-  border-top: 1px solid rgb(16 24 39 / 10%);
+  padding: 0;
 }
 
 .deck-row-strip .hsrdv {
-  --hsrdv-icon-size: 34px;
-  --hsrdv-icon-gap: 12px;
+  --hsrdv-icon-size: 52px;
+  --hsrdv-icon-gap: 18px;
+}
+
+.deck-row-strip .hsrdv-icon-list {
+  padding-top: 8px;
+  padding-bottom: 18px;
 }
 
 .square-ribbon {
@@ -542,22 +479,13 @@ p {
     padding: 12px;
   }
 
-  .deck-row-profile,
-  .deck-row-metrics {
-    padding-right: 14px;
-    padding-left: 14px;
+  .deck-row-showcase {
+    padding: 14px 12px 10px;
   }
 
-  .deck-row-metrics {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .deck-row-metrics dt {
-    font-size: 0.78rem;
-  }
-
-  .deck-row-metrics dd {
-    font-size: 1rem;
+  .deck-row-strip .hsrdv {
+    --hsrdv-icon-size: 48px;
+    --hsrdv-icon-gap: 15px;
   }
 }
 
