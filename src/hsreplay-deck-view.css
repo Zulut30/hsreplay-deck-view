@@ -23,7 +23,7 @@
   --hsrdv-archetype-panel-width: 100px;
   --hsrdv-archetype-panel-skew: 15px;
   --hsrdv-archetype-panel-gap: 4px;
-  --hsrdv-archetype-art-opacity: 0.28;
+  --hsrdv-archetype-art-opacity: 0.34;
   --hsrdv-archetype-icon-size: 54px;
   --hsrdv-stone-portrait-size: 80px;
   --hsrdv-stone-portrait-gap: 12px;
@@ -522,9 +522,9 @@
   background:
     linear-gradient(
       90deg,
-      rgb(247 249 252 / 76%) 0%,
-      rgb(247 249 252 / 62%) 42%,
-      rgb(238 241 245 / 72%) 100%
+      rgb(247 249 252 / 66%) 0%,
+      rgb(247 249 252 / 52%) 42%,
+      rgb(238 241 245 / 62%) 100%
     );
   pointer-events: none;
 }
@@ -582,6 +582,7 @@
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
+  filter: saturate(1.08) brightness(1.08);
   transform: scale(1.5);
 }
 
