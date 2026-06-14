@@ -286,15 +286,15 @@
 }
 
 .hsrdv-card-icon-badge--copies {
-  right: calc(var(--hsrdv-icon-size) * -0.18);
-  bottom: calc(var(--hsrdv-icon-size) * -0.25);
-  font-size: calc(var(--hsrdv-icon-size) * 0.54);
+  right: calc(var(--hsrdv-icon-size) * -0.14);
+  bottom: calc(var(--hsrdv-icon-size) * -0.18);
+  font-size: calc(var(--hsrdv-icon-size) * 0.4);
 }
 
 .hsrdv-card-icon-badge--star {
-  right: calc(var(--hsrdv-icon-size) * -0.28);
-  bottom: calc(var(--hsrdv-icon-size) * -0.36);
-  font-size: calc(var(--hsrdv-icon-size) * 0.94);
+  right: calc(var(--hsrdv-icon-size) * -0.2);
+  bottom: calc(var(--hsrdv-icon-size) * -0.27);
+  font-size: calc(var(--hsrdv-icon-size) * 0.68);
 }
 
 .hsrdv-card-icon:hover {
@@ -357,8 +357,8 @@
 .hsrdv-card-square-badge {
   position: absolute;
   z-index: 2;
-  right: calc(var(--hsrdv-square-icon-size) * -0.18);
-  bottom: calc(var(--hsrdv-square-icon-size) * -0.14);
+  right: calc(var(--hsrdv-square-icon-size) * -0.12);
+  bottom: calc(var(--hsrdv-square-icon-size) * -0.08);
   color: var(--hsrdv-gold);
   font-weight: 900;
   line-height: 1;
@@ -367,13 +367,13 @@
 }
 
 .hsrdv-card-square-badge--copies {
-  font-size: calc(var(--hsrdv-square-icon-size) * 0.45);
+  font-size: calc(var(--hsrdv-square-icon-size) * 0.34);
 }
 
 .hsrdv-card-square-badge--star {
-  right: calc(var(--hsrdv-square-icon-size) * -0.2);
-  bottom: calc(var(--hsrdv-square-icon-size) * -0.26);
-  font-size: calc(var(--hsrdv-square-icon-size) * 0.72);
+  right: calc(var(--hsrdv-square-icon-size) * -0.14);
+  bottom: calc(var(--hsrdv-square-icon-size) * -0.18);
+  font-size: calc(var(--hsrdv-square-icon-size) * 0.52);
 }
 
 .hsrdv-card-square-icon:hover {
