@@ -109,14 +109,22 @@
     html[data-view="showcase"] .icon-section,
     html[data-view="deck"] .square-section,
     html[data-view="showcase"] .square-section,
+    html[data-view="deck"] .archetype-section,
+    html[data-view="showcase"] .archetype-section,
     html[data-view="icons"] .square-section,
+    html[data-view="icons"] .archetype-section,
     html[data-view="squares"] .icon-section,
+    html[data-view="squares"] .archetype-section,
+    html[data-view="archetypes"] .icon-section,
+    html[data-view="archetypes"] .square-section,
+    html[data-view="archetypes"] .demo-grid,
     html[data-view="deck"] .demo-header,
     html[data-view="showcase"] .demo-header,
     html[data-view="icons"] .demo-header,
     html[data-view="icons"] .demo-grid,
     html[data-view="squares"] .demo-header,
-    html[data-view="squares"] .demo-grid {
+    html[data-view="squares"] .demo-grid,
+    html[data-view="archetypes"] .demo-header {
       display: none;
     }
 
@@ -137,15 +145,23 @@
       padding: 8px 0 0;
     }
 
+    html[data-view="archetypes"] .demo-shell {
+      width: min(840px, calc(100vw - 16px));
+      padding: 4px 0 0;
+    }
+
     html[data-view="icons"] .icon-section > h2,
     html[data-view="icons"] .icon-section > .demo-note,
     html[data-view="squares"] .square-section > h2,
-    html[data-view="squares"] .square-section > .demo-note {
+    html[data-view="squares"] .square-section > .demo-note,
+    html[data-view="archetypes"] .archetype-section > h2,
+    html[data-view="archetypes"] .archetype-section > .demo-note {
       display: none;
     }
 
     .icon-section,
-    .square-section {
+    .square-section,
+    .archetype-section {
       margin-bottom: 28px;
     }
 
@@ -290,6 +306,23 @@
       overflow-x: hidden;
     }
 
+    .archetype-row-card {
+      width: 100%;
+      overflow: hidden;
+      background: #eef1f5;
+      border-top: 1px solid #b8b8b8;
+      border-bottom: 1px solid #b8b8b8;
+      box-shadow:
+        inset 0 8px 14px rgb(0 0 0 / 10%),
+        0 8px 22px rgb(26 41 64 / 10%);
+    }
+
+    .archetype-row-card .hsrdv {
+      --hsrdv-archetype-height: 70px;
+      --hsrdv-archetype-art-opacity: 0.42;
+      max-width: none;
+    }
+
     @media (max-width: 760px) {
       .deck-row-summary {
         flex-direction: column;
@@ -394,6 +427,17 @@
       </p>
     </section>
 
+    <section class="demo-section archetype-section" aria-labelledby="archetypes-title">
+      <h2 id="archetypes-title">Archetype art card</h2>
+      <article class="archetype-row-card">
+        <div id="sample-archetypes"></div>
+      </article>
+      <p class="demo-note">
+        Четвертый вариант строит строку архетипа из нескольких 256x-артов:
+        <code>renderArchetypes</code>.
+      </p>
+    </section>
+
     <div class="demo-grid">
       <section class="demo-section deck-section" aria-labelledby="deck-title">
         <h2 id="deck-title">Deck list from data-deck-cards</h2>
@@ -451,6 +495,18 @@
       { id: "AT_072", name: "Вариан Ринн", cost: 10, rarity: "LEGENDARY", elite: true, count: 1 }
     ];
 
+    const ARCHETYPE_CARDS = [
+      {
+        name: "Манипулятор маг",
+        icon: "CS2_029",
+        arts: [
+          { id: "EDR_451", position: "center center" },
+          { id: "EDR_852", position: "center center" },
+          { id: "EDR_264", position: "center center" }
+        ]
+      }
+    ];
+
     function showError(target, error) {
       const element = document.querySelector(target);
       element.className = "demo-error";
@@ -491,6 +547,8 @@
       group: false,
       sort: false
     });
+
+    HSReplayDeckView.renderArchetypes("#sample-archetypes", ARCHETYPE_CARDS);
   </script>
 </body>
 </html>

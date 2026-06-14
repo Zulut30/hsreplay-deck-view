@@ -1,6 +1,6 @@
 # HSReplay Deck View
 
-Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых и квадратных иконок для списков колод.
+Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых/квадратных иконок и строка архетипа с несколькими артами на фоне через диагональные разделители.
 
 Проект не требует сборки и фреймворков. Достаточно подключить CSS и JS.
 
@@ -17,6 +17,10 @@
 ### Квадратные иконки
 
 ![Square icon strip demo](assets/screenshots/square-strip-demo.png)
+
+### Карточка архетипа
+
+![Archetype card demo](assets/screenshots/archetype-card-demo.png)
 
 ### Все редкости и стоимости 0-10
 
@@ -92,6 +96,48 @@
 #deck-squares .hsrdv {
   --hsrdv-square-icon-size: 36px;
   --hsrdv-square-icon-gap: 16px;
+}
+```
+
+## Карточки архетипов
+
+Этот режим повторяет паттерн из meta overview: строка высотой `70px`, слева круглая иконка архетипа, а под названием лежат несколько `256x`-артов карт. Каждый арт вставляется в параллелограмм с базовой шириной `100px`, сдвигается на `-15px`, отделяется светлым диагональным зазором, получает правый градиент и может растягиваться, чтобы заполнить всю строку.
+
+```html
+<link rel="stylesheet" href="src/hsreplay-deck-view.css">
+<div id="archetypes"></div>
+<script src="src/hsreplay-deck-view.js"></script>
+<script>
+  HSReplayDeckView.renderArchetypes("#archetypes", [
+    {
+      name: "Манипулятор маг",
+      icon: "CS2_029",
+      arts: ["EDR_451", "EDR_852", "EDR_264"]
+    }
+  ]);
+</script>
+```
+
+`icon` принимает прямой URL или card id и по умолчанию берет `tiles/{id}.webp`. `arts` принимает card id, прямой URL или объект:
+
+```js
+{
+  id: "EDR_451",
+  position: "center center",
+  scale: 1.5,
+  opacity: 0.2
+}
+```
+
+Полезные CSS-переменные:
+
+```css
+#archetypes .hsrdv {
+  --hsrdv-archetype-height: 70px;
+  --hsrdv-archetype-panel-width: 100px;
+  --hsrdv-archetype-panel-skew: 15px;
+  --hsrdv-archetype-art-opacity: 0.28;
+  --hsrdv-archetype-icon-size: 54px;
 }
 ```
 
@@ -175,6 +221,12 @@ HSReplayDeckView.renderSquareIconsFromDbfIds(target, dbfIds, options)
 Рендерит квадратные иконки из массива dbfId или строки `data-deck-cards`.
 
 ```js
+HSReplayDeckView.renderArchetypes(target, archetypes, options)
+```
+
+Рендерит список карточек архетипов из готовых объектов.
+
+```js
 HSReplayDeckView.cardsFromDbfIds(dbfIds, options)
 ```
 
@@ -198,6 +250,12 @@ HSReplayDeckView.createSquareIcon(card, options)
 
 Возвращает DOM-элемент одной квадратной иконки.
 
+```js
+HSReplayDeckView.createArchetypeCard(archetype, options)
+```
+
+Возвращает DOM-элемент одной карточки архетипа.
+
 Основные опции:
 
 | Опция | По умолчанию | Назначение |
@@ -211,6 +269,10 @@ HSReplayDeckView.createSquareIcon(card, options)
 | `showLegendaryAsStar` | `true` | Показывать `★` у легендарок |
 | `showSingleCountBox` | `false` | Показывать правый счетчик даже для одной копии |
 | `iconBadgeSingleCount` | `false` | Показывать `1` на круглых иконках для одиночных нелегендарных карт |
+| `archetypeArtBaseUrl` | HearthstoneJSON 256x CDN | База URL для фоновых артов архетипа |
+| `archetypeArtFormat` | `webp` | Формат фоновых артов архетипа |
+| `archetypeIconBaseUrl` | HearthstoneJSON tiles CDN | База URL для круглой иконки архетипа |
+| `archetypeIconFormat` | `webp` | Формат круглой иконки архетипа |
 
 ## HTML-паттерн одной плитки
 
@@ -268,6 +330,35 @@ JS генерирует такую структуру:
 </ul>
 ```
 
+## HTML-паттерн карточки архетипа
+
+```html
+<ul class="hsrdv-archetype-list">
+  <li>
+    <article class="hsrdv-archetype-card" aria-label="Манипулятор маг">
+      <div class="hsrdv-archetype-bg" aria-hidden="true">
+        <span class="hsrdv-archetype-art-panel">
+          <span
+            class="hsrdv-archetype-art"
+            style="background-image: url(&quot;https://art.hearthstonejson.com/v1/256x/EDR_451.webp&quot;)"
+          ></span>
+        </span>
+        <span class="hsrdv-archetype-art-panel">
+          <span
+            class="hsrdv-archetype-art"
+            style="background-image: url(&quot;https://art.hearthstonejson.com/v1/256x/EDR_852.webp&quot;)"
+          ></span>
+        </span>
+      </div>
+      <div class="hsrdv-archetype-content">
+        <img class="hsrdv-archetype-icon" src="https://art.hearthstonejson.com/v1/tiles/CS2_029.webp" alt="Манипулятор маг">
+        <h3 class="hsrdv-archetype-title">Манипулятор маг</h3>
+      </div>
+    </article>
+  </li>
+</ul>
+```
+
 ## Демо и скриншоты
 
 Открыть локально:
@@ -294,5 +385,6 @@ CHROMIUM_BIN=/path/to/chromium npm run screenshots
 
 - Данные карт: `https://api.hearthstonejson.com/v1/latest/{locale}/cards.collectible.json`
 - Tile-art: `https://art.hearthstonejson.com/v1/tiles/{cardId}.webp`
+- Full art для архетипов: `https://art.hearthstonejson.com/v1/256x/{cardId}.webp`
 
-Для сайтов, где нельзя зависеть от внешних CDN, передавайте свои поля `image` и готовые данные карт в `renderDeck`.
+Для сайтов, где нельзя зависеть от внешних CDN, передавайте свои поля `image` и готовые данные карт в `renderDeck`, а для архетипов используйте прямые URL в `icon` и `arts`.

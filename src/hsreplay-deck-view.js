@@ -19,7 +19,11 @@
     showLegendaryAsStar: true,
     showSingleCountBox: false,
     imageFallbackFormat: "png",
-    iconBadgeSingleCount: false
+    iconBadgeSingleCount: false,
+    archetypeArtBaseUrl: "https://art.hearthstonejson.com/v1/256x/",
+    archetypeArtFormat: "webp",
+    archetypeIconBaseUrl: "https://art.hearthstonejson.com/v1/tiles/",
+    archetypeIconFormat: "webp"
   };
 
   const RARITY_ORDER = {
@@ -123,6 +127,53 @@
     return `${options.artBaseUrl}${card.id}.${options.artFormat}`;
   }
 
+  function isDirectImageUrl(value) {
+    return /^(https?:)?\/\//i.test(value)
+      || /^(data|blob):/i.test(value)
+      || value.startsWith("/")
+      || value.startsWith("./")
+      || value.startsWith("../");
+  }
+
+  function getArtworkId(artwork) {
+    if (!artwork) {
+      return "";
+    }
+    if (typeof artwork === "string") {
+      return artwork.trim();
+    }
+    return String(artwork.id || artwork.cardId || artwork.card_id || "").trim();
+  }
+
+  function getArtworkUrl(artwork, baseUrl, format) {
+    if (!artwork) {
+      return "";
+    }
+    if (typeof artwork === "string") {
+      const value = artwork.trim();
+      if (!value) {
+        return "";
+      }
+      return isDirectImageUrl(value) ? value : `${baseUrl}${value}.${format}`;
+    }
+
+    const directUrl = artwork.image || artwork.imageUrl || artwork.art || artwork.url || artwork.src;
+    if (directUrl) {
+      return directUrl;
+    }
+
+    const id = getArtworkId(artwork);
+    return id ? `${baseUrl}${id}.${format}` : "";
+  }
+
+  function getArchetypeArtUrl(artwork, options) {
+    return getArtworkUrl(artwork, options.archetypeArtBaseUrl, options.archetypeArtFormat);
+  }
+
+  function getArchetypeIconUrl(artwork, options) {
+    return getArtworkUrl(artwork, options.archetypeIconBaseUrl, options.archetypeIconFormat);
+  }
+
   function createElement(tagName, className, text) {
     const element = document.createElement(tagName);
     if (className) {
@@ -161,6 +212,39 @@
   function prepareCards(cards, options) {
     const normalized = options.group ? groupCards(cards) : cards.map(normalizeCard);
     return options.sort ? sortCards(normalized) : normalized;
+  }
+
+  function parseArchetypeArtworks(input) {
+    if (Array.isArray(input)) {
+      return input;
+    }
+    if (typeof input !== "string") {
+      return [];
+    }
+    return input.split(/[,\s]+/).map((value) => value.trim()).filter(Boolean);
+  }
+
+  function normalizeArchetype(archetype) {
+    if (typeof archetype === "string") {
+      return {
+        name: archetype,
+        icon: "",
+        arts: [],
+        stats: [],
+        url: ""
+      };
+    }
+
+    const raw = archetype || {};
+    return {
+      name: raw.name || raw.title || "Unknown archetype",
+      icon: raw.icon || raw.iconUrl || raw.classIcon || raw.classIconUrl || raw.image || raw.iconCardId || "",
+      iconAlt: raw.iconAlt || raw.className || raw.name || raw.title || "",
+      arts: parseArchetypeArtworks(raw.arts || raw.artworks || raw.cards || raw.cardIds || raw.backgroundCards),
+      stats: Array.isArray(raw.stats) ? raw.stats : [],
+      url: raw.url || raw.href || "",
+      label: raw.label || raw.ariaLabel || ""
+    };
   }
 
   function createTile(rawCard, options) {
@@ -287,6 +371,74 @@
     return icon;
   }
 
+  function createArchetypeCard(rawArchetype, options) {
+    const settings = withDefaults(options);
+    const archetype = normalizeArchetype(rawArchetype);
+    const element = createElement(
+      archetype.url ? "a" : "article",
+      "hsrdv-archetype-card"
+    );
+    element.setAttribute("aria-label", archetype.label || archetype.name);
+    if (archetype.url) {
+      element.href = archetype.url;
+    }
+
+    const background = createElement("div", "hsrdv-archetype-bg");
+    background.setAttribute("aria-hidden", "true");
+
+    archetype.arts.forEach((artwork) => {
+      const artUrl = getArchetypeArtUrl(artwork, settings);
+      if (!artUrl) {
+        return;
+      }
+
+      const panel = createElement("span", "hsrdv-archetype-art-panel");
+      const art = createElement("span", "hsrdv-archetype-art");
+      art.style.backgroundImage = `url("${artUrl}")`;
+
+      if (artwork && typeof artwork === "object") {
+        if (artwork.position || artwork.backgroundPosition) {
+          art.style.backgroundPosition = artwork.position || artwork.backgroundPosition;
+        }
+        if (typeof artwork.scale !== "undefined") {
+          art.style.transform = `scale(${artwork.scale})`;
+        }
+        if (typeof artwork.opacity !== "undefined") {
+          panel.style.opacity = String(artwork.opacity);
+        }
+      }
+
+      panel.appendChild(art);
+      background.appendChild(panel);
+    });
+
+    const content = createElement("div", "hsrdv-archetype-content");
+    const iconUrl = getArchetypeIconUrl(archetype.icon, settings);
+    if (iconUrl) {
+      const icon = createElement("img", "hsrdv-archetype-icon");
+      icon.src = iconUrl;
+      icon.alt = archetype.iconAlt || "";
+      content.appendChild(icon);
+    }
+
+    content.appendChild(createElement("h3", "hsrdv-archetype-title", archetype.name));
+
+    if (archetype.stats.length) {
+      const stats = createElement("dl", "hsrdv-archetype-stats");
+      archetype.stats.forEach((stat) => {
+        const item = createElement("div", "hsrdv-archetype-stat");
+        item.appendChild(createElement("dt", "", stat.label || ""));
+        item.appendChild(createElement("dd", "", stat.value ?? ""));
+        stats.appendChild(item);
+      });
+      content.appendChild(stats);
+    }
+
+    element.appendChild(background);
+    element.appendChild(content);
+    return element;
+  }
+
   function renderDeck(target, cards, options) {
     const settings = withDefaults(options);
     const container = resolveTarget(target);
@@ -353,6 +505,27 @@
     return rootElement;
   }
 
+  function renderArchetypes(target, archetypes, options) {
+    const settings = withDefaults(options);
+    const container = resolveTarget(target);
+    const rootElement = createElement("div", `hsrdv hsrdv-archetypes ${settings.className}`.trim());
+    const list = createElement("ul", "hsrdv-archetype-list");
+
+    (archetypes || []).forEach((archetype) => {
+      const item = createElement("li");
+      item.appendChild(createArchetypeCard(archetype, settings));
+      list.appendChild(item);
+    });
+
+    rootElement.appendChild(list);
+    if (settings.clear) {
+      container.replaceChildren(rootElement);
+    } else {
+      container.appendChild(rootElement);
+    }
+    return rootElement;
+  }
+
   async function loadCardDatabase(options) {
     const settings = withDefaults(options);
     const url = settings.dataUrl.replace("{locale}", settings.locale);
@@ -396,6 +569,7 @@
   }
 
   return {
+    createArchetypeCard,
     createIcon,
     createSquareIcon,
     createTile,
@@ -406,6 +580,7 @@
     parseDeckCards,
     renderDeck,
     renderDeckFromDbfIds,
+    renderArchetypes,
     renderIcons,
     renderIconsFromDbfIds,
     renderSquareIcons,

@@ -52,6 +52,7 @@ mkdirSync(screenshotDir, { recursive: true });
 const chromium = findChromium();
 capture(chromium, "icon-strip-demo.png", "icons", "1320,260");
 capture(chromium, "square-strip-demo.png", "squares", "1564,230");
+capture(chromium, "archetype-card-demo.png", "archetypes", "840,150");
 capture(chromium, "deck-demo.png", "deck", "620,1540");
 capture(chromium, "rarity-cost-showcase.png", "showcase", "620,1160");
 capture(chromium, "mobile-demo.png", "deck", "390,920");
