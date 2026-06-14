@@ -27,7 +27,7 @@
   --hsrdv-archetype-icon-size: 54px;
   --hsrdv-stone-portrait-size: 80px;
   --hsrdv-stone-portrait-gap: 12px;
-  --hsrdv-stone-portrait-art-inset: 12px;
+  --hsrdv-stone-portrait-art-inset: 8px;
   --hsrdv-stone-portrait-frame-image: url("https://static.hsreplay.net/static/webpack/assets/images/battlegrounds/minion-frame.d21732172d83faeae997.png");
   --hsrdv-icon-badge-shadow:
     -1px -1px 0 var(--hsrdv-black),
@@ -669,7 +669,7 @@
     --hsrdv-archetype-panel-width: 88px;
     --hsrdv-stone-portrait-size: 72px;
     --hsrdv-stone-portrait-gap: 10px;
-    --hsrdv-stone-portrait-art-inset: 11px;
+    --hsrdv-stone-portrait-art-inset: 8px;
   }
 
   .hsrdv-card-cost {

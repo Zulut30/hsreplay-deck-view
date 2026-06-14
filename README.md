@@ -176,7 +176,7 @@ GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
 #stone-portrait .hsrdv {
   --hsrdv-stone-portrait-size: 80px;
   --hsrdv-stone-portrait-gap: 12px;
-  --hsrdv-stone-portrait-art-inset: 12px;
+  --hsrdv-stone-portrait-art-inset: 8px;
 }
 ```
 
