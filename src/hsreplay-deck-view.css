@@ -746,17 +746,34 @@
 }
 
 .hsrdv-mulligan-card {
+  position: relative;
   display: grid;
   min-width: 0;
   gap: 14px;
   padding: 16px;
-  border: 1px solid rgb(29 54 87 / 20%);
+  overflow: hidden;
+  border: 1px solid rgb(110 85 42 / 34%);
   border-radius: 8px;
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 96%), rgb(242 246 250 / 92%));
-  box-shadow: 0 12px 30px rgb(32 45 66 / 12%);
+    linear-gradient(135deg, rgb(138 99 46 / 14%) 0 18%, rgb(138 99 46 / 0%) 18% 100%),
+    linear-gradient(180deg, #fffaf0 0%, #edf4f2 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 74%),
+    0 12px 30px rgb(32 45 66 / 13%);
   color: #121820;
+  isolation: isolate;
   text-decoration: none;
+}
+
+.hsrdv-mulligan-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgb(29 54 87 / 10%) 0 1px, transparent 1px 100%) 0 0 / 18px 100%;
+  opacity: 0.36;
+  pointer-events: none;
 }
 
 .hsrdv-mulligan-header {
@@ -790,9 +807,10 @@
 .hsrdv-mulligan-badge {
   flex: 0 0 auto;
   padding: 5px 8px;
-  border: 1px solid rgb(29 54 87 / 14%);
-  border-radius: 7px;
-  background: #121820;
+  border: 1px solid rgb(18 24 32 / 24%);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, #26323f, #121820);
   color: #fff;
   font-size: 0.72rem;
   font-weight: 900;
@@ -810,18 +828,33 @@
 .hsrdv-mulligan-item {
   --hsrdv-mulligan-status-color: #b8832e;
   --hsrdv-mulligan-status-bg: rgb(184 131 46 / 14%);
+  position: relative;
   display: grid;
   min-width: 0;
   grid-template-columns: var(--hsrdv-mulligan-art-size) minmax(0, 1fr);
   gap: 10px;
   align-items: center;
   padding: 9px;
-  border: 1px solid rgb(29 54 87 / 15%);
-  border-left: 5px solid var(--hsrdv-mulligan-status-color);
-  border-radius: 8px;
-  background: rgb(255 255 255 / 78%);
+  overflow: hidden;
+  border: 1px solid rgb(29 54 87 / 16%);
+  border-radius: 7px;
+  background:
+    linear-gradient(90deg, rgb(18 24 32 / 6%), rgb(255 255 255 / 0%) 42%),
+    linear-gradient(180deg, rgb(255 255 255 / 86%), rgb(239 246 244 / 82%));
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 46%),
+    0 1px 0 rgb(255 255 255 / 70%);
   color: #121820;
   text-decoration: none;
+}
+
+.hsrdv-mulligan-item::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--hsrdv-mulligan-status-color);
+  box-shadow: 0 0 18px var(--hsrdv-mulligan-status-bg);
 }
 
 .hsrdv-mulligan-item--keep {
@@ -845,12 +878,13 @@
   width: var(--hsrdv-mulligan-art-size);
   height: var(--hsrdv-mulligan-art-size);
   overflow: hidden;
-  border: 1px solid var(--hsrdv-black);
-  border-radius: 8px;
+  border: 2px solid #1a1712;
+  border-radius: 6px;
   background: var(--hsrdv-frame-bg);
   box-shadow:
-    0 1px 2px rgb(0 0 0 / 28%),
-    inset 0 0 0 1px rgb(255 255 255 / 14%);
+    0 1px 2px rgb(0 0 0 / 34%),
+    inset 0 0 0 1px rgb(255 255 255 / 18%),
+    0 0 0 1px rgb(138 99 46 / 32%);
 }
 
 .hsrdv-mulligan-art {
@@ -882,9 +916,9 @@
 .hsrdv-mulligan-status {
   width: fit-content;
   padding: 3px 6px;
-  border-radius: 6px;
-  background: var(--hsrdv-mulligan-status-bg);
-  color: var(--hsrdv-mulligan-status-color);
+  border-radius: 5px;
+  background: var(--hsrdv-mulligan-status-color);
+  color: #fff;
   font-size: 0.68rem;
   font-weight: 900;
   line-height: 1;
@@ -962,13 +996,15 @@
   grid-template-columns: minmax(190px, 1.35fr) 96px minmax(150px, 1fr) minmax(150px, auto);
   gap: 14px;
   align-items: center;
-  padding: 10px 12px;
-  border: 1px solid rgb(29 54 87 / 16%);
-  border-left: 5px solid var(--hsrdv-matchup-color);
-  border-radius: 8px;
+  padding: 10px 12px 10px 10px;
+  border: 1px solid rgb(29 54 87 / 22%);
+  border-radius: 7px;
   background:
+    linear-gradient(90deg, var(--hsrdv-matchup-color) 0 5px, rgb(255 255 255 / 0%) 5px 100%),
     linear-gradient(180deg, rgb(255 255 255 / 94%), rgb(246 248 251 / 92%));
-  box-shadow: 0 10px 24px rgb(32 45 66 / 10%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 56%),
+    0 10px 24px rgb(32 45 66 / 10%);
   color: #121820;
   text-decoration: none;
 }
@@ -990,6 +1026,11 @@
   min-width: 0;
   align-items: center;
   gap: 10px;
+  padding: 6px 10px 6px 6px;
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, #1e2a37, #111820);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 9%);
 }
 
 .hsrdv-matchup-icon {
@@ -999,7 +1040,7 @@
   flex: 0 0 var(--hsrdv-matchup-icon-size);
   place-items: center;
   overflow: hidden;
-  border: 2px solid #4d452f;
+  border: 2px solid #756642;
   border-radius: 50%;
   background: #232323;
   color: #fff;
@@ -1009,7 +1050,8 @@
   object-position: center;
   box-shadow:
     inset 0 0 0 2px #171512,
-    0 1px 2px rgb(0 0 0 / 35%);
+    0 1px 2px rgb(0 0 0 / 35%),
+    0 0 0 1px rgb(255 255 255 / 12%);
 }
 
 .hsrdv-matchup-text {
@@ -1020,7 +1062,7 @@
 
 .hsrdv-matchup-text strong {
   overflow: hidden;
-  color: #121820;
+  color: #fff;
   font-size: 0.98rem;
   font-weight: 900;
   line-height: 1.1;
@@ -1030,7 +1072,7 @@
 
 .hsrdv-matchup-text span {
   overflow: hidden;
-  color: #667085;
+  color: rgb(255 255 255 / 68%);
   font-size: 0.74rem;
   font-weight: 850;
   line-height: 1.1;
@@ -1061,12 +1103,12 @@
 
 .hsrdv-matchup-gauge {
   position: relative;
-  height: 12px;
+  height: 16px;
   overflow: hidden;
-  border: 1px solid rgb(29 54 87 / 18%);
-  border-radius: 999px;
+  border: 1px solid rgb(29 54 87 / 24%);
+  border-radius: 4px;
   background:
-    linear-gradient(90deg, rgb(200 72 60 / 14%) 0 50%, rgb(47 143 91 / 14%) 50% 100%);
+    linear-gradient(90deg, rgb(200 72 60 / 18%) 0 50%, rgb(47 143 91 / 18%) 50% 100%);
 }
 
 .hsrdv-matchup-gauge-fill {
@@ -1074,7 +1116,9 @@
   inset: 0 auto 0 0;
   width: var(--hsrdv-matchup-winrate);
   border-radius: inherit;
-  background: linear-gradient(90deg, rgb(200 72 60 / 82%), var(--hsrdv-matchup-color));
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 26%), rgb(255 255 255 / 0%)),
+    linear-gradient(90deg, rgb(200 72 60 / 86%), var(--hsrdv-matchup-color));
 }
 
 .hsrdv-matchup-gauge-mid {
@@ -1152,6 +1196,7 @@
 .hsrdv-meta-badge {
   --hsrdv-meta-accent: #54708f;
   --hsrdv-meta-soft: rgb(84 112 143 / 12%);
+  position: relative;
   display: grid;
   min-width: 0;
   min-height: 128px;
@@ -1159,15 +1204,29 @@
   gap: 8px;
   padding: 13px;
   overflow: hidden;
-  border: 1px solid rgb(29 54 87 / 17%);
-  border-top: 5px solid var(--hsrdv-meta-accent);
-  border-radius: 8px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-left: 5px solid var(--hsrdv-meta-accent);
+  border-radius: 7px;
   background:
-    radial-gradient(circle at 100% 0, var(--hsrdv-meta-soft), transparent 52%),
-    linear-gradient(180deg, rgb(255 255 255 / 96%), rgb(246 248 251 / 94%));
-  box-shadow: 0 10px 24px rgb(32 45 66 / 10%);
-  color: #121820;
+    linear-gradient(135deg, var(--hsrdv-meta-soft) 0 30%, transparent 30% 100%),
+    linear-gradient(180deg, #1d2733 0%, #121820 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 10%),
+    0 10px 24px rgb(32 45 66 / 14%);
+  color: #fff;
   text-decoration: none;
+}
+
+.hsrdv-meta-badge::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: -18px;
+  width: 68px;
+  height: 68px;
+  border: 1px solid var(--hsrdv-meta-accent);
+  border-radius: 50%;
+  opacity: 0.18;
 }
 
 .hsrdv-meta-badge--tier-1 {
@@ -1212,7 +1271,7 @@
 .hsrdv-meta-badge-delta {
   width: fit-content;
   padding: 4px 7px;
-  border-radius: 7px;
+  border-radius: 5px;
   font-size: 0.72rem;
   font-weight: 900;
   line-height: 1;
@@ -1222,16 +1281,17 @@
 .hsrdv-meta-badge-label {
   background: var(--hsrdv-meta-accent);
   color: #fff;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 14%) inset;
 }
 
 .hsrdv-meta-badge-delta {
-  background: var(--hsrdv-meta-soft);
+  background: rgb(255 255 255 / 9%);
   color: var(--hsrdv-meta-accent);
 }
 
 .hsrdv-meta-badge-title {
   overflow: hidden;
-  color: #121820;
+  color: #fff;
   font-size: 1.05rem;
   font-weight: 900;
   line-height: 1.08;
@@ -1249,7 +1309,7 @@
 .hsrdv-meta-badge-description {
   display: -webkit-box;
   overflow: hidden;
-  color: #667085;
+  color: rgb(255 255 255 / 66%);
   font-size: 0.78rem;
   font-weight: 750;
   line-height: 1.25;
@@ -1283,12 +1343,15 @@
   min-width: 0;
   gap: 12px;
   padding: 13px;
-  border: 1px solid rgb(29 54 87 / 18%);
-  border-radius: 8px;
+  border: 1px solid rgb(125 212 255 / 18%);
+  border-radius: 7px;
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 96%), rgb(244 248 252 / 94%));
-  box-shadow: 0 10px 24px rgb(32 45 66 / 10%);
-  color: #121820;
+    linear-gradient(90deg, rgb(125 212 255 / 6%) 0 1px, transparent 1px 100%) 0 0 / 18px 100%,
+    linear-gradient(180deg, #172331 0%, #0f151d 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 8%),
+    0 10px 24px rgb(32 45 66 / 15%);
+  color: #edf7ff;
   text-decoration: none;
 }
 
@@ -1307,7 +1370,7 @@
 .hsrdv-cost-curve-title {
   margin: 0;
   overflow: hidden;
-  color: #121820;
+  color: #fff;
   font-size: 1.05rem;
   font-weight: 900;
   line-height: 1.08;
@@ -1318,7 +1381,7 @@
 .hsrdv-cost-curve-subtitle {
   margin: 4px 0 0;
   overflow: hidden;
-  color: #667085;
+  color: rgb(237 247 255 / 62%);
   font-size: 0.74rem;
   font-weight: 800;
   line-height: 1.2;
@@ -1329,8 +1392,10 @@
 .hsrdv-cost-curve-badge {
   flex: 0 0 auto;
   padding: 4px 7px;
-  border-radius: 7px;
-  background: #1f4c7a;
+  border: 1px solid rgb(125 212 255 / 26%);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, #2c78a8, #164261);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 900;
@@ -1357,7 +1422,7 @@
 }
 
 .hsrdv-cost-curve-count {
-  color: #121820;
+  color: #eaf7ff;
   font-size: 0.72rem;
   font-weight: 900;
   line-height: 1;
@@ -1370,10 +1435,10 @@
   min-height: 0;
   align-items: flex-end;
   overflow: hidden;
-  border: 1px solid rgb(31 76 122 / 20%);
-  border-radius: 6px 6px 3px 3px;
+  border: 1px solid rgb(125 212 255 / 22%);
+  border-radius: 5px 5px 3px 3px;
   background:
-    linear-gradient(180deg, rgb(31 76 122 / 8%), rgb(31 76 122 / 15%));
+    linear-gradient(180deg, rgb(255 255 255 / 5%), rgb(125 212 255 / 8%));
 }
 
 .hsrdv-cost-curve-fill {
@@ -1382,7 +1447,7 @@
   height: max(3px, calc(100% * var(--hsrdv-cost-curve-ratio)));
   border-radius: 5px 5px 2px 2px;
   background:
-    linear-gradient(180deg, #7dd4ff 0%, #3486c5 48%, #1f4c7a 100%);
+    linear-gradient(180deg, #b5ecff 0%, #47aee7 44%, #11517d 100%);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 44%),
     0 -1px 8px rgb(52 134 197 / 18%);
@@ -1393,10 +1458,10 @@
   min-width: 24px;
   height: 18px;
   place-items: center;
-  border: 1px solid rgb(31 76 122 / 20%);
+  border: 1px solid rgb(125 212 255 / 26%);
   border-radius: 999px;
-  background: rgb(31 76 122 / 10%);
-  color: #1f4c7a;
+  background: rgb(125 212 255 / 12%);
+  color: #cbeeff;
   font-size: 0.68rem;
   font-weight: 900;
   line-height: 1;
@@ -1408,7 +1473,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: #667085;
+  color: rgb(237 247 255 / 62%);
   font-size: 0.72rem;
   font-weight: 900;
   line-height: 1;
