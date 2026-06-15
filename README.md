@@ -271,7 +271,7 @@ console.log(dom.window.document.body.innerHTML);
   --hsrdv-icon-size: 54px;
   --hsrdv-icon-gap: 14px;
   --hsrdv-icon-art-position: 58% center;
-  --hsrdv-icon-art-background-size: auto 100%;
+  --hsrdv-icon-art-background-size: auto 80%;
 }
 ```
 
@@ -311,6 +311,8 @@ HSReplayDeckView.renderIcons("#deck-icons", [
 | `focus: { x, y }` | `{ x: 52, y: 42 }` | То же самое, но одним объектом |
 | `scale` / `artScale` / `zoom` | `1.08` | Делает `background-size: auto 108%` |
 | `backgroundSize` / `artSize` | `"auto 120%"` | Полный ручной контроль `background-size` |
+
+По умолчанию маленькие маски используют два слоя одной картинки: верхний слой уменьшен до `auto 80%`, а нижний `cover`-слой закрывает края маски. Если нужно еще дальше отъехать, задайте карте `scale: 0.82`; если нужно приблизить конкретный портрет, задайте `scale: 1.05`.
 
 Тот же фокус работает в `renderSquareIcons`, `renderSynergies`, `renderMulligans` и маленьких картах `renderMatchups`.
 
@@ -366,7 +368,7 @@ HSReplayDeckView.renderIcons("#deck-icons", [
   --hsrdv-square-icon-size: 58px;
   --hsrdv-square-icon-gap: 20px;
   --hsrdv-square-art-position: 56% center;
-  --hsrdv-square-art-background-size: auto 104%;
+  --hsrdv-square-art-background-size: auto 80%;
 }
 ```
 

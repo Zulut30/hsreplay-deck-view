@@ -111,7 +111,9 @@ Circle strip, square strip, synergy items, mulligan cards и matchup mini-cards 
 - `scale`, `artScale`, `zoom`;
 - `backgroundSize`, `artSize`.
 
-`scale: 1.08` нормализуется в `background-size: auto 108%`. Если нужен полный контроль, используйте `backgroundSize: "auto 120%"` или другой валидный CSS value.
+`scale: 1.08` нормализуется в `background-size: auto 108%`, а `scale: 0.82` в `auto 82%`. Если нужен полный контроль, используйте `backgroundSize: "auto 120%"` или другой валидный CSS value.
+
+Small masked art uses two layers by default: the front layer is zoomed out (`auto 80%`) and the back layer is `cover`, so circles and square icons show more of the card without empty edges.
 
 ## Component Contracts
 
@@ -158,7 +160,7 @@ Circle strip, square strip, synergy items, mulligan cards и matchup mini-cards 
 - `--hsrdv-square-art-position`
 - `--hsrdv-square-art-background-size`
 
-Если меняете размер, проверяйте `×2` и `★`: они должны выглядеть одинаково по весу и не перекрывать соседние иконки. Если в круге/квадрате виден край tile-арта вместо персонажа или объекта, не двигайте весь компонент глобально; сначала добавьте `position`/`focusX`/`scale` конкретной карте.
+Если меняете размер, проверяйте `×2` и `★`: они должны выглядеть одинаково по весу и не перекрывать соседние иконки. Если в круге/квадрате виден край tile-арта вместо персонажа или объекта, не двигайте весь компонент глобально; сначала добавьте `position`/`focusX`/`scale` конкретной карте. Для общего “отъезда камеры” меняйте `--hsrdv-icon-art-background-size` и `--hsrdv-square-art-background-size`, но держите второй cover-слой.
 
 ### Archetype Row
 

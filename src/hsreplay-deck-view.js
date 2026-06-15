@@ -170,6 +170,10 @@
     }
   }
 
+  function setMaskedArtBackground(element, artUrl) {
+    element.style.backgroundImage = `url("${artUrl}"), url("${artUrl}")`;
+  }
+
   function normalizeCard(card) {
     const rarity = normalizeRarity(card.rarity);
     const artPresentation = getArtPresentation(card);
@@ -969,7 +973,7 @@
 
     const artUrl = getArtUrl(card, settings);
     if (artUrl) {
-      icon.style.backgroundImage = `url("${artUrl}")`;
+      setMaskedArtBackground(icon, artUrl);
       applyArtPresentation(icon, card);
     }
 
@@ -1002,7 +1006,7 @@
 
     const artUrl = getArtUrl(card, settings);
     if (artUrl) {
-      icon.style.backgroundImage = `url("${artUrl}")`;
+      setMaskedArtBackground(icon, artUrl);
       applyArtPresentation(icon, card);
     }
 
@@ -1139,7 +1143,7 @@
     const artUrl = getSynergyArtUrl(item, settings);
     if (artUrl) {
       const art = createElement("span", "hsrdv-synergy-art");
-      art.style.backgroundImage = `url("${artUrl}")`;
+      setMaskedArtBackground(art, artUrl);
       applyArtPresentation(art, item);
       artBox.appendChild(art);
     }
@@ -1237,7 +1241,7 @@
     const artUrl = getMulliganArtUrl(item, settings);
     if (artUrl) {
       const art = createElement("span", "hsrdv-mulligan-art");
-      art.style.backgroundImage = `url("${artUrl}")`;
+      setMaskedArtBackground(art, artUrl);
       applyArtPresentation(art, item);
       artBox.appendChild(art);
     }
@@ -1319,7 +1323,7 @@
 
     const artUrl = getMatchupArtUrl(card, settings);
     if (artUrl) {
-      element.style.backgroundImage = `url("${artUrl}")`;
+      setMaskedArtBackground(element, artUrl);
       applyArtPresentation(element, card);
     }
     if (badgeLabel) {
