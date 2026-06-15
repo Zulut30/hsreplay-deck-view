@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HSReplay Deck View Components</title>
+  <title>HSReplay Deck View Wiki</title>
   <meta
     name="description"
-    content="Витрина переиспользуемых Hearthstone-компонентов: плитки карт, круглые и квадратные иконки, архетипы, портреты Battlegrounds, синергии, mulligan, matchups, meta badges и mana curve."
+    content="Минималистичная wiki-документация переиспользуемых Hearthstone-компонентов: плитки карт, иконки, архетипы, синергии, mulligan, matchups, meta badges и mana curve."
   >
   <script>
     document.documentElement.dataset.view = new URLSearchParams(location.search).get("view") || "all";
@@ -28,7 +28,8 @@
         <small>Reusable Hearthstone UI patterns</small>
       </span>
     </a>
-    <nav class="site-nav" aria-label="Навигация по витрине">
+    <nav class="site-nav" aria-label="Навигация по wiki">
+      <a href="#overview">Overview</a>
       <a href="#tiles">Плитки</a>
       <a href="#icons">Иконки</a>
       <a href="#archetypes">Архетипы</a>
@@ -45,12 +46,12 @@
 
   <main class="site-main">
     <section id="overview" class="site-section overview-section" aria-labelledby="overview-title">
-      <div class="section-kicker">Live component gallery</div>
+      <div class="section-kicker">Component wiki</div>
       <div class="overview-heading">
-        <h1 id="overview-title">Все варианты карточек для Hearthstone-страниц</h1>
+        <h1 id="overview-title">HSReplay Deck View</h1>
         <p>
-          Одна маленькая библиотека без сборки: подключил CSS/JS, передал готовые карты или card id,
-          получил HSReplay-похожие плитки, иконки и архетипы.
+          Минималистичная документация и живые примеры Hearthstone-компонентов:
+          подключите CSS/JS, передайте карты или card id, затем адаптируйте вид через переменные.
         </p>
       </div>
 
