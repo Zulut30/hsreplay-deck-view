@@ -3,7 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "description": "Reusable Hearthstone deck tile pattern inspired by HSReplay.",
-  "type": "module",
+  "main": "./src/hsreplay-deck-view.js",
+  "types": "./src/hsreplay-deck-view.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/hsreplay-deck-view.d.ts",
+      "require": "./src/hsreplay-deck-view.js",
+      "default": "./src/hsreplay-deck-view.js"
+    },
+    "./css": "./src/hsreplay-deck-view.css",
+    "./design": "./DESIGN.md"
+  },
+  "sideEffects": [
+    "./src/hsreplay-deck-view.css"
+  ],
   "scripts": {
     "serve": "python3 -m http.server 8080",
     "screenshots": "node scripts/capture-screenshots.mjs"

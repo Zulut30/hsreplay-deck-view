@@ -2,7 +2,7 @@
 
 Переиспользуемый паттерн Hearthstone-плиток в стиле HSReplay: стоимость слева, цвет редкости, tile-art, затемнение под текстом, название с `ellipsis`, счетчик копий или звезда для легендарок. Также есть компактные режимы круглых/квадратных иконок, строка архетипа с несколькими артами на фоне через диагональные разделители, большой каменный Battlegrounds-портрет, карточка синергии для комбо/BG-связок, mulligan card, matchup row, tier/meta badges и deck cost curve.
 
-Проект не требует сборки и фреймворков. Достаточно подключить CSS и JS.
+Проект не требует сборки и фреймворков. Достаточно подключить CSS и JS. Для React/TypeScript/Next.js добавлен `src/hsreplay-deck-view.d.ts`, а для LLM и дизайнерских правок есть отдельный [DESIGN.md](DESIGN.md).
 
 ## Живая витрина
 
@@ -76,6 +76,163 @@ GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
 ```
 
 `renderDeckFromDbfIds` берет dbfId, загружает карточную базу HearthstoneJSON, группирует дубликаты, сортирует карты по стоимости и рисует плитки.
+
+## Совместимость
+
+| Среда | Статус | Как подключать |
+|---|---|---|
+| Plain HTML / WordPress / Yii2 / PHP-шаблоны | Полная | Подключить `src/hsreplay-deck-view.css` и `src/hsreplay-deck-view.js` через `<link>`/`<script>` |
+| React | Полная на клиенте | Рендерить в `ref` внутри `useEffect`; компонент сам управляет DOM внутри контейнера |
+| TypeScript | Типизировано | Использовать `src/hsreplay-deck-view.d.ts` или package `types` |
+| Next.js App Router | Полная в client component | Подключать JS через `next/script` или динамически в `useEffect`; не вызывать render-методы во время SSR |
+| Node.js | Частичная | Data helpers работают в Node 18+; DOM-render методы требуют `document` или JSDOM |
+
+Важно: все `render*` методы создают реальные DOM-элементы через `document.createElement`. Поэтому в SSR/Node без DOM нужно либо вызывать только data helpers (`parseDeckCards`, `cardsFromDbfIds`, `groupCards`, `sortCards`, `normalize*`), либо дать DOM через JSDOM.
+
+### React + TypeScript
+
+```tsx
+import { useEffect, useRef } from "react";
+import type HSReplayDeckView = require("hsreplay-deck-view");
+import "hsreplay-deck-view/css";
+
+type Card = HSReplayDeckView.Card;
+
+export function DeckTiles({ cards }: { cards: Card[] }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const api = window.HSReplayDeckView;
+    api.renderDeck(ref.current, cards, {
+      className: "my-deck-tiles",
+      clear: true
+    });
+
+    return () => ref.current?.replaceChildren();
+  }, [cards]);
+
+  return <div ref={ref} />;
+}
+```
+
+Если библиотека подключается не как npm-пакет, а локальными файлами из `public/vendor`, добавьте reference к типам:
+
+```ts
+/// <reference path="../public/vendor/hsreplay-deck-view.d.ts" />
+```
+
+и используйте глобальный тип:
+
+```ts
+const api: HSReplayDeckView.Api = window.HSReplayDeckView;
+```
+
+### Next.js App Router
+
+В Next.js все визуальные компоненты должны жить в client component, потому что библиотека работает с DOM.
+
+```tsx
+"use client";
+
+import Script from "next/script";
+import { useEffect, useRef, useState } from "react";
+import "./hsreplay-deck-view.css";
+
+export function DeckCurve({ cards }: { cards: HSReplayDeckView.Card[] }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!ready || !ref.current) return;
+    window.HSReplayDeckView.renderCostCurve(ref.current, cards, {
+      className: "deck-card-curve"
+    });
+  }, [ready, cards]);
+
+  return (
+    <>
+      <Script
+        src="/vendor/hsreplay-deck-view.js"
+        strategy="afterInteractive"
+        onLoad={() => setReady(true)}
+      />
+      <div ref={ref} />
+    </>
+  );
+}
+```
+
+Практичный вариант для Next.js:
+
+- положить `hsreplay-deck-view.js`, `hsreplay-deck-view.css`, `hsreplay-deck-view.d.ts` в `public/vendor/`;
+- подключать CSS глобально в `app/layout.tsx` или рядом с client component;
+- не импортировать JS-файл в server component;
+- не вызывать `render*` до загрузки `<Script>`.
+
+### Node.js
+
+В Node.js можно использовать CommonJS entry point:
+
+```js
+const HSReplayDeckView = require("./src/hsreplay-deck-view.js");
+
+const cards = HSReplayDeckView.groupCards([
+  { id: "CORE_EX1_145", name: "Подготовка", cost: 0, count: 2 },
+  { id: "CATA_190h", name: "Смертокрыл", cost: 10, count: 1 }
+]);
+
+console.log(cards);
+```
+
+Для `cardsFromDbfIds` нужен `fetch`; в Node 18+ он есть из коробки. Для `renderDeck`, `createTile`, `renderCostCurve` и других DOM-методов нужен browser DOM или JSDOM:
+
+```js
+const { JSDOM } = require("jsdom");
+const HSReplayDeckView = require("./src/hsreplay-deck-view.js");
+
+const dom = new JSDOM('<div id="deck"></div>');
+global.document = dom.window.document;
+
+HSReplayDeckView.renderDeck("#deck", cards);
+console.log(dom.window.document.body.innerHTML);
+```
+
+## Адаптация под уникальный дизайн
+
+Компоненты специально разделены на API, HTML-паттерн и CSS-классы с префиксом `hsrdv-`. Их можно глубоко менять под другой сайт без переписывания JS.
+
+Рекомендуемый порядок кастомизации:
+
+1. Передать `className` в render-метод и скоупить дизайн от него.
+2. Сначала менять CSS-переменные: размеры, gap, ширину, высоту, opacity.
+3. Потом переопределять конкретные классы компонента внутри своей темы.
+4. Для сложной темы менять фон/рамки/теневые акценты, но сохранять DOM-классы и aria/data-атрибуты.
+5. Для другого CDN или локальных картинок передавать `image`, `imageUrl`, `art`, `icon`, `arts`, `stonePortraitFrameImage`.
+
+Пример скоупа под свой сайт:
+
+```css
+.my-meta-page .hsrdv {
+  --hsrdv-icon-size: 46px;
+  --hsrdv-meta-badge-width: 100%;
+  --hsrdv-cost-curve-height: 116px;
+}
+
+.my-meta-page .hsrdv-meta-badge {
+  border-radius: 4px;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 34%), rgb(0 0 0 / 12%)),
+    var(--my-deck-panel);
+}
+
+.my-meta-page .hsrdv-cost-curve-fill {
+  background: linear-gradient(180deg, #fff2a8, #c98928 56%, #6e4211);
+}
+```
+
+Для LLM-доработок и сложных дизайн-систем используйте [DESIGN.md](DESIGN.md): там описаны границы компонентов, что можно менять, что нельзя ломать, какие классы являются контрактом и как проверять результат.
 
 ## Круглые иконки
 
