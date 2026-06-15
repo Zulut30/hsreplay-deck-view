@@ -281,8 +281,8 @@ p {
 }
 
 .icons-preview .hsrdv {
-  --hsrdv-icon-size: 48px;
-  --hsrdv-icon-gap: 14px;
+  --hsrdv-icon-size: 52px;
+  --hsrdv-icon-gap: 16px;
 }
 
 .icons-preview .hsrdv-icon-list {
@@ -291,8 +291,8 @@ p {
 }
 
 .squares-preview .hsrdv {
-  --hsrdv-square-icon-size: 54px;
-  --hsrdv-square-icon-gap: 16px;
+  --hsrdv-square-icon-size: 58px;
+  --hsrdv-square-icon-gap: 18px;
 }
 
 .squares-preview .hsrdv-square-icon-list {
@@ -484,8 +484,8 @@ p {
 }
 
 .deck-row-strip .hsrdv {
-  --hsrdv-icon-size: 52px;
-  --hsrdv-icon-gap: 18px;
+  --hsrdv-icon-size: 58px;
+  --hsrdv-icon-gap: 20px;
 }
 
 .deck-row-strip .hsrdv-icon-list {
@@ -504,8 +504,8 @@ p {
 }
 
 .square-ribbon .hsrdv {
-  --hsrdv-square-icon-size: 58px;
-  --hsrdv-square-icon-gap: 20px;
+  --hsrdv-square-icon-size: 64px;
+  --hsrdv-square-icon-gap: 18px;
 }
 
 .square-ribbon .hsrdv-square-icon-list {
@@ -575,7 +575,7 @@ p {
 
 .synergy-board .hsrdv {
   --hsrdv-synergy-card-width: 100%;
-  --hsrdv-synergy-item-size: 72px;
+  --hsrdv-synergy-item-size: 78px;
   --hsrdv-synergy-item-gap: 14px;
   --hsrdv-synergy-connector-size: 38px;
 }
@@ -712,8 +712,23 @@ p {
   }
 
   .deck-row-strip .hsrdv {
-    --hsrdv-icon-size: 48px;
-    --hsrdv-icon-gap: 15px;
+    --hsrdv-icon-size: 52px;
+    --hsrdv-icon-gap: 16px;
+  }
+
+  .deck-row-strip .hsrdv-icon-list,
+  .square-ribbon .hsrdv-square-icon-list {
+    justify-content: flex-start;
+  }
+
+  .square-ribbon {
+    min-height: 144px;
+    padding: 20px 12px;
+  }
+
+  .square-ribbon .hsrdv {
+    --hsrdv-square-icon-size: 54px;
+    --hsrdv-square-icon-gap: 16px;
   }
 
   .stone-comp-showcase {
@@ -734,7 +749,7 @@ p {
   }
 
   .synergy-board .hsrdv {
-    --hsrdv-synergy-item-size: 58px;
+    --hsrdv-synergy-item-size: 64px;
     --hsrdv-synergy-item-gap: 9px;
     --hsrdv-synergy-connector-size: 24px;
   }

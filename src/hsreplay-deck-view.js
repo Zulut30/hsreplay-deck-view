@@ -100,8 +100,79 @@
     return String(rarity || "common").toLowerCase();
   }
 
+  function normalizeArtAxis(value, fallback) {
+    if (value === null || typeof value === "undefined" || value === "") {
+      return fallback;
+    }
+    if (Number.isFinite(Number(value))) {
+      return `${Number(value)}%`;
+    }
+    return String(value).trim() || fallback;
+  }
+
+  function normalizeArtBackgroundSize(value) {
+    if (value === null || typeof value === "undefined" || value === "") {
+      return "";
+    }
+    if (Number.isFinite(Number(value))) {
+      const scale = Number(value);
+      return `auto ${scale <= 10 ? scale * 100 : scale}%`;
+    }
+
+    const text = String(value).trim();
+    if (!text) {
+      return "";
+    }
+    if (/^-?\d+(\.\d+)?%$/.test(text)) {
+      return `auto ${text}`;
+    }
+    return text;
+  }
+
+  function getArtPresentation(raw) {
+    if (!raw || typeof raw !== "object") {
+      return {
+        artPosition: "",
+        artSize: ""
+      };
+    }
+
+    const focus = raw.focus && typeof raw.focus === "object" ? raw.focus : {};
+    const focusX = raw.focusX ?? raw.artFocusX ?? raw.backgroundFocusX ?? focus.x;
+    const focusY = raw.focusY ?? raw.artFocusY ?? raw.backgroundFocusY ?? focus.y;
+    const explicitPosition = raw.position
+      || raw.artPosition
+      || raw.backgroundPosition
+      || raw.objectPosition
+      || raw.imagePosition
+      || "";
+    const artPosition = explicitPosition
+      ? String(explicitPosition).trim()
+      : (typeof focusX !== "undefined" || typeof focusY !== "undefined")
+        ? `${normalizeArtAxis(focusX, "50%")} ${normalizeArtAxis(focusY, "50%")}`
+        : "";
+    const artSize = normalizeArtBackgroundSize(
+      raw.backgroundSize ?? raw.artSize ?? raw.scale ?? raw.artScale ?? raw.zoom
+    );
+
+    return {
+      artPosition,
+      artSize
+    };
+  }
+
+  function applyArtPresentation(element, item) {
+    if (item.artPosition) {
+      element.style.setProperty("--hsrdv-card-art-position", item.artPosition);
+    }
+    if (item.artSize) {
+      element.style.setProperty("--hsrdv-card-art-background-size", item.artSize);
+    }
+  }
+
   function normalizeCard(card) {
     const rarity = normalizeRarity(card.rarity);
+    const artPresentation = getArtPresentation(card);
     return {
       id: card.id || card.cardId || "",
       dbfId: card.dbfId || card.dbf_id || null,
@@ -111,6 +182,8 @@
       elite: Boolean(card.elite) || rarity === "legendary",
       count: Math.max(1, Number(card.count || 1)),
       image: card.image || card.imageUrl || card.art || "",
+      artPosition: artPresentation.artPosition,
+      artSize: artPresentation.artSize,
       predicted: Boolean(card.predicted)
     };
   }
@@ -431,12 +504,15 @@
         rarity: "common",
         count: 1,
         elite: false,
+        artPosition: "",
+        artSize: "",
         predicted: false
       };
     }
 
     const raw = item || {};
     const rarity = normalizeRarity(raw.rarity);
+    const artPresentation = getArtPresentation(raw);
     return {
       id: String(raw.id || raw.cardId || raw.card_id || "").trim(),
       dbfId: raw.dbfId || raw.dbf_id || null,
@@ -447,6 +523,8 @@
       rarity,
       count: Math.max(1, Number(raw.count || 1)),
       elite: Boolean(raw.elite) || rarity === "legendary",
+      artPosition: artPresentation.artPosition,
+      artSize: artPresentation.artSize,
       predicted: Boolean(raw.predicted)
     };
   }
@@ -539,6 +617,8 @@
         winrate: "",
         status: "situational",
         note: "",
+        artPosition: "",
+        artSize: "",
         predicted: false
       };
     }
@@ -546,6 +626,7 @@
     const raw = item || {};
     const keepRate = raw.keepRate ?? raw.keep ?? raw.kept ?? raw.keepPercent ?? raw.keep_percentage ?? "";
     const status = normalizeMulliganStatus(raw.status || raw.decision || raw.state || raw.label, keepRate);
+    const artPresentation = getArtPresentation(raw);
     return {
       id: String(raw.id || raw.cardId || raw.card_id || "").trim(),
       dbfId: raw.dbfId || raw.dbf_id || null,
@@ -557,6 +638,8 @@
       winrate: raw.winrate ?? raw.winRate ?? raw.wr ?? "",
       status,
       note: raw.note || raw.reason || raw.caption || "",
+      artPosition: artPresentation.artPosition,
+      artSize: artPresentation.artSize,
       predicted: Boolean(raw.predicted)
     };
   }
@@ -622,11 +705,14 @@
         image: isImage ? value : "",
         rarity: "common",
         count: 1,
-        elite: false
+        elite: false,
+        artPosition: "",
+        artSize: ""
       };
     }
     const raw = card || {};
     const rarity = normalizeRarity(raw.rarity);
+    const artPresentation = getArtPresentation(raw);
     return {
       id: String(raw.id || raw.cardId || raw.card_id || "").trim(),
       dbfId: raw.dbfId || raw.dbf_id || null,
@@ -634,7 +720,9 @@
       image: raw.image || raw.imageUrl || raw.art || raw.src || "",
       rarity,
       count: Math.max(1, Number(raw.count || 1)),
-      elite: Boolean(raw.elite) || rarity === "legendary"
+      elite: Boolean(raw.elite) || rarity === "legendary",
+      artPosition: artPresentation.artPosition,
+      artSize: artPresentation.artSize
     };
   }
 
@@ -882,6 +970,7 @@
     const artUrl = getArtUrl(card, settings);
     if (artUrl) {
       icon.style.backgroundImage = `url("${artUrl}")`;
+      applyArtPresentation(icon, card);
     }
 
     if (badgeLabel) {
@@ -914,6 +1003,7 @@
     const artUrl = getArtUrl(card, settings);
     if (artUrl) {
       icon.style.backgroundImage = `url("${artUrl}")`;
+      applyArtPresentation(icon, card);
     }
 
     if (badgeLabel) {
@@ -1050,6 +1140,7 @@
     if (artUrl) {
       const art = createElement("span", "hsrdv-synergy-art");
       art.style.backgroundImage = `url("${artUrl}")`;
+      applyArtPresentation(art, item);
       artBox.appendChild(art);
     }
     if (badgeLabel) {
@@ -1147,6 +1238,7 @@
     if (artUrl) {
       const art = createElement("span", "hsrdv-mulligan-art");
       art.style.backgroundImage = `url("${artUrl}")`;
+      applyArtPresentation(art, item);
       artBox.appendChild(art);
     }
     element.appendChild(artBox);
@@ -1228,6 +1320,7 @@
     const artUrl = getMatchupArtUrl(card, settings);
     if (artUrl) {
       element.style.backgroundImage = `url("${artUrl}")`;
+      applyArtPresentation(element, card);
     }
     if (badgeLabel) {
       const badgeClass = badgeLabel === "★"

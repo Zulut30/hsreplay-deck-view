@@ -64,6 +64,7 @@
 6. Не использовать один доминирующий hue на всю страницу.
 7. Длинные русские названия должны обрезаться предсказуемо, без перекрытий.
 8. На мобильном компоненты должны оставаться usable, даже если часть строк прокручивается горизонтально.
+9. Маленькие арты в круге/квадрате должны показывать главный объект карты; если общий кроп не попадает, задавайте фокус на уровне данных.
 
 ## Архитектура кастомизации
 
@@ -88,6 +89,29 @@ HSReplayDeckView.renderMetaBadges("#meta", badges, {
 ```
 
 Сначала используйте CSS-переменные. Если их не хватает, добавляйте scoped class overrides. Глобально переписывать `.hsrdv-*` стоит только если меняется базовый дизайн всей библиотеки.
+
+## Art Crop Contract
+
+Circle strip, square strip, synergy items, mulligan cards и matchup mini-cards используют широкий `tiles/{id}.webp` как CSS background. Для ручной корректировки кропа каждая карта может принимать поля:
+
+```js
+{
+  id: "CORE_EX1_145",
+  name: "Подготовка",
+  position: "48% center",
+  scale: 1.06
+}
+```
+
+Поддерживаемые aliases:
+
+- `position`, `artPosition`, `backgroundPosition`, `objectPosition`, `imagePosition`;
+- `focusX` + `focusY`, `artFocusX` + `artFocusY`, `backgroundFocusX` + `backgroundFocusY`;
+- `focus: { x, y }`;
+- `scale`, `artScale`, `zoom`;
+- `backgroundSize`, `artSize`.
+
+`scale: 1.08` нормализуется в `background-size: auto 108%`. Если нужен полный контроль, используйте `backgroundSize: "auto 120%"` или другой валидный CSS value.
 
 ## Component Contracts
 
@@ -129,8 +153,12 @@ HSReplayDeckView.renderMetaBadges("#meta", badges, {
 - `--hsrdv-square-icon-gap`
 - `--hsrdv-icon-art-x`
 - `--hsrdv-icon-art-scale`
+- `--hsrdv-icon-art-position`
+- `--hsrdv-icon-art-background-size`
+- `--hsrdv-square-art-position`
+- `--hsrdv-square-art-background-size`
 
-Если меняете размер, проверяйте `×2` и `★`: они должны выглядеть одинаково по весу и не перекрывать соседние иконки.
+Если меняете размер, проверяйте `×2` и `★`: они должны выглядеть одинаково по весу и не перекрывать соседние иконки. Если в круге/квадрате виден край tile-арта вместо персонажа или объекта, не двигайте весь компонент глобально; сначала добавьте `position`/`focusX`/`scale` конкретной карте.
 
 ### Archetype Row
 
@@ -182,6 +210,8 @@ HSReplayDeckView.renderMetaBadges("#meta", badges, {
 - `--hsrdv-synergy-item-size`
 - `--hsrdv-synergy-item-gap`
 - `--hsrdv-synergy-connector-size`
+- `--hsrdv-synergy-art-position`
+- `--hsrdv-synergy-art-background-size`
 
 `connector: "plus"` означает “работают вместе”. `connector: "arrow"` означает порядок действий. Не заменяйте оба на один визуальный паттерн.
 
@@ -201,6 +231,8 @@ HSReplayDeckView.renderMetaBadges("#meta", badges, {
 - `--hsrdv-mulligan-card-width`
 - `--hsrdv-mulligan-art-size`
 - `--hsrdv-mulligan-gap`
+- `--hsrdv-mulligan-art-position`
+- `--hsrdv-mulligan-art-background-size`
 
 Дизайн должен быстро отвечать: оставить, подумать, заменить. Цвет статуса должен быть виден даже при беглом сканировании.
 
@@ -221,6 +253,8 @@ HSReplayDeckView.renderMetaBadges("#meta", badges, {
 - `--hsrdv-matchup-row-width`
 - `--hsrdv-matchup-icon-size`
 - `--hsrdv-matchup-card-size`
+- `--hsrdv-matchup-art-position`
+- `--hsrdv-matchup-art-background-size`
 
 Сначала читается opponent, потом winrate, потом gauge, потом key cards. Не переставляйте порядок без причины.
 
@@ -334,7 +368,8 @@ npm run screenshots
 
 - `assets/screenshots/site-showcase.png`
 - the component-specific screenshot;
-- `assets/screenshots/mobile-demo.png` when layout or typography changed.
+- `assets/screenshots/mobile-demo.png` when deck layout or typography changed;
+- `assets/screenshots/mobile-icons-demo.png`, `mobile-squares-demo.png`, `mobile-synergy-demo.png` when icon crop, horizontal rows, or synergy cards changed.
 
 ## QA Checklist
 
@@ -342,6 +377,7 @@ Before shipping:
 
 - No text overlap in Russian names.
 - `×2` and `★` are not oversized.
+- Circle/square icons show a recognizable card subject, not only an empty edge of the tile.
 - Mobile view is usable.
 - Dark components have readable contrast.
 - Screenshots in README match current design.

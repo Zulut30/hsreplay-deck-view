@@ -11,6 +11,32 @@ declare namespace HSReplayDeckView {
   type MulliganStatus = "keep" | "situational" | "replace" | "оставлять" | "ситуативно" | "менять" | string;
   type MatchupStatus = "favored" | "even" | "unfavored" | string;
   type MetaKind = "tier-1" | "tier-2" | "counter" | "meme" | "rising" | "falling" | string;
+  type ArtScale = number | string;
+
+  interface ArtFocus {
+    x?: number | string;
+    y?: number | string;
+  }
+
+  interface ArtCrop {
+    position?: string;
+    artPosition?: string;
+    backgroundPosition?: string;
+    objectPosition?: string;
+    imagePosition?: string;
+    focus?: ArtFocus;
+    focusX?: number | string;
+    focusY?: number | string;
+    artFocusX?: number | string;
+    artFocusY?: number | string;
+    backgroundFocusX?: number | string;
+    backgroundFocusY?: number | string;
+    scale?: ArtScale;
+    artScale?: ArtScale;
+    zoom?: ArtScale;
+    artSize?: string;
+    backgroundSize?: string;
+  }
 
   interface Options {
     locale?: string;
@@ -45,7 +71,7 @@ declare namespace HSReplayDeckView {
     costCurveShowTotal?: boolean;
   }
 
-  interface Card {
+  interface Card extends ArtCrop {
     id?: string;
     cardId?: string;
     card_id?: string;
@@ -77,10 +103,12 @@ declare namespace HSReplayDeckView {
     elite: boolean;
     count: number;
     image: string;
+    artPosition: string;
+    artSize: string;
     predicted: boolean;
   }
 
-  interface Artwork {
+  interface Artwork extends ArtCrop {
     id?: string;
     cardId?: string;
     card_id?: string;
@@ -89,10 +117,6 @@ declare namespace HSReplayDeckView {
     art?: string;
     url?: string;
     src?: string;
-    position?: string;
-    backgroundPosition?: string;
-    objectPosition?: string;
-    scale?: number | string;
     opacity?: number | string;
     [key: string]: unknown;
   }
@@ -130,9 +154,6 @@ declare namespace HSReplayDeckView {
 
   interface StonePortrait extends Card {
     portrait?: string;
-    position?: string;
-    objectPosition?: string;
-    imagePosition?: string;
   }
 
   interface SynergyItem extends Card {

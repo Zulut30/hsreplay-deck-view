@@ -2,20 +2,20 @@
   "use strict";
 
   const DECK_CARDS = [
-    { id: "EDR_451", name: "Гибельная тень", cost: 0, rarity: "LEGENDARY", elite: true, count: 1 },
-    { id: "CORE_EX1_145", name: "Подготовка", cost: 0, rarity: "EPIC", count: 2 },
-    { id: "CORE_CS2_072", name: "Удар в спину", cost: 0, rarity: "COMMON", count: 2 },
-    { id: "EDR_852", name: "Агент Древних", cost: 1, rarity: "RARE", count: 2 },
-    { id: "EDR_264", name: "Дежавю", cost: 1, rarity: "RARE", count: 2 },
-    { id: "CORE_NEW1_021", name: "Кошмарное топливо", cost: 1, rarity: "COMMON", count: 2 },
-    { id: "TLC_835", name: "Ледниковый осколок", cost: 1, rarity: "COMMON", count: 2 },
-    { id: "CORE_CFM_604", name: "Веер клинков", cost: 2, rarity: "COMMON", count: 1 },
-    { id: "END_020", name: "Карта сектантов", cost: 2, rarity: "RARE", count: 2 },
-    { id: "TIME_045", name: "Сумеречный обряд", cost: 2, rarity: "RARE", count: 2 },
-    { id: "TLC_248", name: "Безумный приспешник", cost: 3, rarity: "EPIC", count: 2 },
-    { id: "TLC_100", name: "Навигатор Элиза", cost: 4, rarity: "LEGENDARY", elite: true, count: 1 },
-    { id: "AT_072", name: "Вариан Ринн", cost: 10, rarity: "LEGENDARY", elite: true, count: 1 },
-    { id: "CATA_190h", name: "Смертокрыл Разрушитель миров", cost: 10, rarity: "LEGENDARY", elite: true, count: 1 }
+    { id: "EDR_451", name: "Гибельная тень", cost: 0, rarity: "LEGENDARY", elite: true, count: 1, position: "55% center" },
+    { id: "CORE_EX1_145", name: "Подготовка", cost: 0, rarity: "EPIC", count: 2, position: "48% center" },
+    { id: "CORE_CS2_072", name: "Удар в спину", cost: 0, rarity: "COMMON", count: 2, position: "57% center" },
+    { id: "EDR_852", name: "Агент Древних", cost: 1, rarity: "RARE", count: 2, position: "50% center" },
+    { id: "EDR_264", name: "Дежавю", cost: 1, rarity: "RARE", count: 2, position: "62% center" },
+    { id: "CORE_NEW1_021", name: "Кошмарное топливо", cost: 1, rarity: "COMMON", count: 2, position: "55% center" },
+    { id: "TLC_835", name: "Ледниковый осколок", cost: 1, rarity: "COMMON", count: 2, position: "52% center" },
+    { id: "CORE_CFM_604", name: "Веер клинков", cost: 2, rarity: "COMMON", count: 1, position: "58% center" },
+    { id: "END_020", name: "Карта сектантов", cost: 2, rarity: "RARE", count: 2, position: "52% center" },
+    { id: "TIME_045", name: "Сумеречный обряд", cost: 2, rarity: "RARE", count: 2, position: "49% center" },
+    { id: "TLC_248", name: "Безумный приспешник", cost: 3, rarity: "EPIC", count: 2, position: "51% center" },
+    { id: "TLC_100", name: "Навигатор Элиза", cost: 4, rarity: "LEGENDARY", elite: true, count: 1, position: "55% center" },
+    { id: "AT_072", name: "Вариан Ринн", cost: 10, rarity: "LEGENDARY", elite: true, count: 1, position: "58% center" },
+    { id: "CATA_190h", name: "Смертокрыл Разрушитель миров", cost: 10, rarity: "LEGENDARY", elite: true, count: 1, position: "61% center" }
   ];
 
   const RARITY_CARDS = [
@@ -101,9 +101,9 @@
       badge: "+ chain",
       connector: "plus",
       items: [
-        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", label: "discount", count: 2 },
-        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", label: "resource", count: 2 },
-        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", label: "payoff", count: 2 }
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", label: "discount", count: 2, position: "48% center" },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", label: "resource", count: 2, position: "50% center" },
+        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", label: "payoff", count: 2, position: "49% center" }
       ],
       result: {
         label: "Итог",
@@ -117,9 +117,9 @@
       badge: "arrow",
       connector: "arrow",
       items: [
-        { id: "BGS_018", name: "Голдринн", rarity: "LEGENDARY", elite: true, label: "core" },
-        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", label: "trigger", count: 2 },
-        { id: "CATA_190h", name: "Финишер", rarity: "LEGENDARY", elite: true, label: "board" }
+        { id: "BGS_018", name: "Голдринн", rarity: "LEGENDARY", elite: true, label: "core", image: "https://art.hearthstonejson.com/v1/256x/BGS_018.webp", position: "50% 35%", scale: 1.08 },
+        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", label: "trigger", count: 2, position: "52% center" },
+        { id: "CATA_190h", name: "Финишер", rarity: "LEGENDARY", elite: true, label: "board", position: "61% center" }
       ],
       result: "Понятный порядок действий для гайда или разбора"
     }
@@ -131,10 +131,10 @@
       subtitle: "Стартовая рука против поля: быстрый темп, добор и один ситуативный keep.",
       badge: "ranked",
       cards: [
-        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", keepRate: 74.2, winrate: 55.8, status: "keep", note: "лучший темповый старт", count: 2 },
-        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", keepRate: 68.1, winrate: 54.6, status: "keep", note: "оставлять почти всегда", count: 2 },
-        { id: "END_020", name: "Карта сектантов", rarity: "RARE", keepRate: 49.4, winrate: 51.1, status: "situational", note: "лучше с монеткой", count: 2 },
-        { id: "CATA_190h", name: "Смертокрыл", rarity: "LEGENDARY", keepRate: 11.8, winrate: 43.2, status: "replace", note: "слишком тяжелая карта" }
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", keepRate: 74.2, winrate: 55.8, status: "keep", note: "лучший темповый старт", count: 2, position: "48% center" },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", keepRate: 68.1, winrate: 54.6, status: "keep", note: "оставлять почти всегда", count: 2, position: "50% center" },
+        { id: "END_020", name: "Карта сектантов", rarity: "RARE", keepRate: 49.4, winrate: 51.1, status: "situational", note: "лучше с монеткой", count: 2, position: "52% center" },
+        { id: "CATA_190h", name: "Смертокрыл", rarity: "LEGENDARY", keepRate: 11.8, winrate: 43.2, status: "replace", note: "слишком тяжелая карта", position: "61% center" }
       ]
     },
     {
@@ -142,10 +142,10 @@
       subtitle: "Оставляем ранний ответ и ресурс, дорогие payoff-карты меняем.",
       badge: "vs aggro",
       cards: [
-        { id: "CORE_CS2_072", name: "Удар в спину", rarity: "COMMON", keepRate: 81.4, winrate: 57.3, status: "keep", count: 2 },
-        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", keepRate: 63.9, winrate: 52.8, status: "keep", count: 2 },
-        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", keepRate: 42.5, winrate: 49.6, status: "situational", count: 2 },
-        { id: "AT_072", name: "Вариан Ринн", rarity: "LEGENDARY", keepRate: 8.7, winrate: 41.9, status: "replace" }
+        { id: "CORE_CS2_072", name: "Удар в спину", rarity: "COMMON", keepRate: 81.4, winrate: 57.3, status: "keep", count: 2, position: "57% center" },
+        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", keepRate: 63.9, winrate: 52.8, status: "keep", count: 2, position: "52% center" },
+        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", keepRate: 42.5, winrate: 49.6, status: "situational", count: 2, position: "49% center" },
+        { id: "AT_072", name: "Вариан Ринн", rarity: "LEGENDARY", keepRate: 8.7, winrate: 41.9, status: "replace", position: "58% center" }
       ]
     }
   ];
@@ -159,9 +159,9 @@
       games: 3240,
       status: "favored",
       cards: [
-        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", count: 2 },
-        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", count: 2 },
-        { id: "TLC_100", name: "Навигатор Элиза", rarity: "LEGENDARY", elite: true }
+        { id: "CORE_EX1_145", name: "Подготовка", rarity: "EPIC", count: 2, position: "48% center" },
+        { id: "EDR_852", name: "Агент Древних", rarity: "RARE", count: 2, position: "50% center" },
+        { id: "TLC_100", name: "Навигатор Элиза", rarity: "LEGENDARY", elite: true, position: "55% center" }
       ]
     },
     {
@@ -172,9 +172,9 @@
       games: 2180,
       status: "even",
       cards: [
-        { id: "CORE_CS2_072", name: "Удар в спину", rarity: "COMMON", count: 2 },
-        { id: "END_020", name: "Карта сектантов", rarity: "RARE", count: 2 },
-        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", count: 2 }
+        { id: "CORE_CS2_072", name: "Удар в спину", rarity: "COMMON", count: 2, position: "57% center" },
+        { id: "END_020", name: "Карта сектантов", rarity: "RARE", count: 2, position: "52% center" },
+        { id: "TIME_045", name: "Сумеречный обряд", rarity: "RARE", count: 2, position: "49% center" }
       ]
     },
     {
@@ -185,9 +185,9 @@
       games: 1560,
       status: "unfavored",
       cards: [
-        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", count: 2 },
-        { id: "CORE_CFM_604", name: "Веер клинков", rarity: "COMMON" },
-        { id: "CATA_190h", name: "Смертокрыл", rarity: "LEGENDARY", elite: true }
+        { id: "TLC_835", name: "Ледниковый осколок", rarity: "COMMON", count: 2, position: "52% center" },
+        { id: "CORE_CFM_604", name: "Веер клинков", rarity: "COMMON", position: "58% center" },
+        { id: "CATA_190h", name: "Смертокрыл", rarity: "LEGENDARY", elite: true, position: "61% center" }
       ]
     }
   ];

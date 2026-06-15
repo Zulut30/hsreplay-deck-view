@@ -60,6 +60,18 @@ GitHub Pages: https://zulut30.github.io/hsreplay-deck-view/
 
 ![Mobile demo](assets/screenshots/mobile-demo.png)
 
+### Мобильные круглые иконки
+
+![Mobile circle icon strip demo](assets/screenshots/mobile-icons-demo.png)
+
+### Мобильные квадратные иконки
+
+![Mobile square icon strip demo](assets/screenshots/mobile-squares-demo.png)
+
+### Мобильная карточка синергии
+
+![Mobile synergy card demo](assets/screenshots/mobile-synergy-demo.png)
+
 ## Быстрый старт
 
 ```html
@@ -210,6 +222,7 @@ console.log(dom.window.document.body.innerHTML);
 3. Потом переопределять конкретные классы компонента внутри своей темы.
 4. Для сложной темы менять фон/рамки/теневые акценты, но сохранять DOM-классы и aria/data-атрибуты.
 5. Для другого CDN или локальных картинок передавать `image`, `imageUrl`, `art`, `icon`, `arts`, `stonePortraitFrameImage`.
+6. Для маленьких круглых/квадратных кропов задавать фокус арта через `position`, `focusX/focusY` или `scale`.
 
 Пример скоупа под свой сайт:
 
@@ -251,12 +264,81 @@ console.log(dom.window.document.body.innerHTML);
 </script>
 ```
 
-Круги повторяют HSReplay-паттерн из инспектора: `border-radius: 50%`, `background-position-x: -61.7647px` для размера 30px и `background-size: 111.176px 100%`. В CSS это пересчитано через переменные, поэтому размер можно менять:
+Круги повторяют HSReplay-паттерн из инспектора: `border-radius: 50%`, tile-art как `background-image`, маленький бейдж `×2` или `★` поверх рамки. По умолчанию кроп смещен ближе к центру арта, чтобы в маленьком круге чаще было видно главный объект карты:
 
 ```css
 #deck-icons .hsrdv {
   --hsrdv-icon-size: 54px;
   --hsrdv-icon-gap: 14px;
+  --hsrdv-icon-art-position: 58% center;
+  --hsrdv-icon-art-background-size: auto 100%;
+}
+```
+
+### Фокус арта в маленьких иконках
+
+Tile-art у HearthstoneJSON широкий, а круглая/квадратная иконка маленькая. Поэтому один общий кроп не всегда попадает в лицо, оружие или главный объект карты. Компонент поддерживает ручную настройку на уровне каждой карты:
+
+```js
+HSReplayDeckView.renderIcons("#deck-icons", [
+  {
+    id: "CORE_EX1_145",
+    name: "Подготовка",
+    cost: 0,
+    rarity: "EPIC",
+    count: 2,
+    position: "48% center"
+  },
+  {
+    id: "BGS_018",
+    name: "Голдринн",
+    rarity: "LEGENDARY",
+    elite: true,
+    image: "https://art.hearthstonejson.com/v1/256x/BGS_018.webp",
+    focusX: 50,
+    focusY: 35,
+    scale: 1.08
+  }
+]);
+```
+
+Поддерживаемые поля:
+
+| Поле | Пример | Что делает |
+|---|---|---|
+| `position` / `artPosition` / `backgroundPosition` | `"58% center"` | Напрямую задает `background-position` |
+| `focusX` + `focusY` | `50`, `35` | Собираются в позицию `"50% 35%"` |
+| `focus: { x, y }` | `{ x: 52, y: 42 }` | То же самое, но одним объектом |
+| `scale` / `artScale` / `zoom` | `1.08` | Делает `background-size: auto 108%` |
+| `backgroundSize` / `artSize` | `"auto 120%"` | Полный ручной контроль `background-size` |
+
+Тот же фокус работает в `renderSquareIcons`, `renderSynergies`, `renderMulligans` и маленьких картах `renderMatchups`.
+
+### Мобильная адаптация
+
+В базовом CSS есть breakpoint `max-width: 520px`. На нем:
+
+- плитки колоды становятся ниже и сохраняют читаемую стоимость/счетчик;
+- круглые и квадратные иконки становятся крупнее, выравниваются от левого края и прокручиваются горизонтально;
+- карточки синергий сохраняют крупный арт, но подписи могут переноситься на две строки;
+- mulligan/meta блоки переходят в одну колонку;
+- matchup row складывается в вертикальную строку: противник, winrate, шкала, ключевые карты.
+
+Для сайта с собственной сеткой обычно достаточно обернуть компонент и задать переменные:
+
+```css
+.article-deck-widget .hsrdv {
+  --hsrdv-icon-size: 50px;
+  --hsrdv-square-icon-size: 54px;
+  --hsrdv-synergy-card-width: 100%;
+}
+
+@media (max-width: 520px) {
+  .article-deck-widget .hsrdv {
+    --hsrdv-icon-size: 46px;
+    --hsrdv-square-icon-size: 48px;
+    --hsrdv-synergy-item-size: 62px;
+  }
 }
 ```
 
@@ -277,12 +359,14 @@ console.log(dom.window.document.body.innerHTML);
 </script>
 ```
 
-Размеры из инспектора HSReplay для 36px-иконки: `border-radius: 8px`, `background-position-x: -74.1176px`, `background-size: 133.412px 100%`. В компоненте это тоже пересчитано через переменные:
+Базовый квадрат использует `border-radius: 8px`, маленькую темную рамку, белую боковую тень и тот же фокус арта, что круглые иконки. Глобальный кроп можно менять переменными:
 
 ```css
 #deck-squares .hsrdv {
   --hsrdv-square-icon-size: 58px;
   --hsrdv-square-icon-gap: 20px;
+  --hsrdv-square-art-position: 56% center;
+  --hsrdv-square-art-background-size: auto 104%;
 }
 ```
 
@@ -466,6 +550,7 @@ result: {
 | `href` / `url` | string | Если задан, конкретный элемент становится ссылкой |
 | `dbfId` | number | Пишется в `data-dbf-id`, если нужен трекинг |
 | `predicted` | boolean | Делает элемент полупрозрачным и серым |
+| `position` / `focusX` / `focusY` / `scale` | string/number | Ручной фокус и масштаб маленького арта |
 
 Можно передать не объект, а просто строку:
 
@@ -557,6 +642,7 @@ items: ["CORE_EX1_145", "EDR_852", "TIME_045"]
 | `note` / `reason` / `caption` | string | Маленькая подпись под метриками |
 | `image` / `imageUrl` / `art` / `src` | string | Прямой URL картинки |
 | `href` / `url` | string | Если задан, отдельная карта становится ссылкой |
+| `position` / `focusX` / `focusY` / `scale` | string/number | Ручной фокус и масштаб маленького арта |
 
 Если `status` не передан, компонент сам оценит его по `keepRate`: примерно `62%+` как `keep`, `45-61%` как `situational`, ниже как `replace`.
 
@@ -609,6 +695,8 @@ Matchup row нужен для мета-таблиц и страниц архет
 | `status` / `result` / `state` | string | `favored`, `even`, `unfavored`; если не задано, считается по winrate |
 | `cards` / `keyCards` / `items` | array | Маленькие ключевые карты справа |
 | `url` / `href` | string | Если задан, строка становится ссылкой |
+
+Внутри `cards` можно использовать те же поля фокуса арта: `position`, `focusX`, `focusY`, `focus` и `scale`.
 
 Порог автоматического статуса: `53%+` как `favored`, `47-53%` как `even`, ниже `47%` как `unfavored`.
 

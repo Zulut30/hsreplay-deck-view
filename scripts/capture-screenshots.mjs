@@ -63,3 +63,6 @@ capture(chromium, "cost-curve-demo.png", "cost-curve", "720,520");
 capture(chromium, "deck-demo.png", "deck", "620,1540");
 capture(chromium, "rarity-cost-showcase.png", "showcase", "620,1160");
 capture(chromium, "mobile-demo.png", "deck", "390,920");
+capture(chromium, "mobile-icons-demo.png", "icons", "390,220");
+capture(chromium, "mobile-squares-demo.png", "squares", "390,220");
+capture(chromium, "mobile-synergy-demo.png", "synergies", "390,760");
